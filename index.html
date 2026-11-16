@@ -221,7 +221,7 @@
                 <p class="text-xs text-sky-100 mt-1">لتشييد و تشطيب المباني • نظام إدارة التسعير السحابي</p>
             </div>
 
-            <form id="loginForm" onsubmit="handleLoginSubmit(event)" autocomplete="off" class="p-6 sm:p-8 space-y-5">
+            <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="p-6 sm:p-8 space-y-5">
                 <div id="loginErrorBox" class="hidden p-3.5 rounded-2xl bg-red-500/15 border border-red-500/40 text-red-600 dark:text-red-400 text-xs font-bold flex items-center gap-2">
                     <i class="fa-solid fa-circle-exclamation text-base shrink-0"></i>
                     <span id="loginErrorText"></span>
@@ -233,7 +233,7 @@
                     </label>
                     <div class="relative">
                         <i class="fa-solid fa-user absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                        <input type="text" id="loginUsername" required oninput="onLoginUsernameInput()" autocomplete="off" placeholder="أدخل اسم المستخدم" 
+                        <input type="text" id="loginUsername" required oninput="onLoginUsernameInput()" autocomplete="username" placeholder="أدخل اسم المستخدم" 
                             class="w-full pr-10 pl-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm font-bold num-en text-right outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition">
                     </div>
                 </div>
@@ -244,7 +244,7 @@
                     </label>
                     <div class="relative">
                         <i class="fa-solid fa-lock absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                        <input type="password" id="loginPassword" required autocomplete="new-password" placeholder="••••••••" 
+                        <input type="password" id="loginPassword" required autocomplete="current-password" placeholder="••••••••" 
                             class="w-full pr-10 pl-10 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm font-bold num-en text-right outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition">
                         <button type="button" onclick="toggleLoginPasswordVisibility()" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-sky-500 cursor-pointer">
                             <i id="loginPassEyeIcon" class="fa-solid fa-eye text-sm"></i>
@@ -258,7 +258,7 @@
                         <i class="fa-solid fa-id-badge"></i>
                         <span>اسم الموظف الشخصي (إلزامي لحساب المكتب) <span class="text-red-500">*</span></span>
                     </label>
-                    <input type="text" id="loginStaffPersonalName" autocomplete="off" placeholder="اكتب اسمك ..." 
+                    <input type="text" id="loginStaffPersonalName" placeholder="اكتب اسمك الأول (مثلاً: سارة / أحمد)..." 
                         class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-amber-400 text-sm font-bold outline-none focus:border-amber-500">
                     <p class="text-[11px] text-slate-500 dark:text-slate-400">سيظهر اسمك في النظام وسجل الحركات كـ: <strong class="text-amber-600 dark:text-amber-400">موظف المكتب (اسمك)</strong></p>
                 </div>
@@ -269,8 +269,8 @@
                 </button>
 
                 <div class="pt-2 text-center text-[11px] text-slate-400 flex items-center justify-center gap-1.5">
-                    <i class="fa-solid fa-shield-halved text-sky-500"></i>
-                    <span>مؤمّن بالكامل • يتطلب تسجيل الدخول في كل مرة</span>
+                    <i class="fa-solid fa-cloud-arrow-up text-sky-500"></i>
+                    <span>مربوط سحابياً ومزامن لحظياً  </span>
                 </div>
             </form>
         </div>
@@ -978,7 +978,7 @@
         </div>
     </div>
 
-    <!-- نافذة تغيير الحالة السريع للمستخدم المحدود (للمشاريع الخاصة بالمدير) -->
+    <!-- نافذة تغيير الحالة السريع للمستخدم المحدود (للمشاريع المقفلة الخاصة بالمدير) -->
     <div id="quickStatusModal" class="fixed inset-0 z-[60] hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="max-w-md w-full bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 shadow-2xl space-y-4">
             <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
@@ -994,9 +994,9 @@
             <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-700 dark:text-amber-300 space-y-1">
                 <div class="font-extrabold flex items-center gap-1.5">
                     <i class="fa-solid fa-lock"></i>
-                    <span>مشروع مسجل بواسطة الإدارة (للقراءة فقط)</span>
+                    <span>مشروع مسجل بواسطة الإدارة</span>
                 </div>
-                <p>يمكنك الاطلاع على كافة تفاصيل وأسعار المشروع وطباعتها، ولكن التعديل المسموح لك هو <strong>تغيير حالة المشروع فقط</strong>.</p>
+                <p>صلاحياتك تسمح بتغيير <strong>حالة المشروع فقط</strong> دون فتح أو تعديل تفاصيله الداخلية.</p>
             </div>
 
             <div>
@@ -1206,8 +1206,7 @@
                     role: normalizedRole
                 };
 
-                // عدم حفظ بيانات الجلسة في التخزين الدائم لضمان طلب كلمة المرور عند كل دخول
-                localStorage.removeItem(SESSION_STORAGE_KEY);
+                localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
                 await initializeAuthenticatedApp();
                 showToast(`مرحباً بك، ${currentUser.displayName}`, 'success');
             } catch (err) {
@@ -1228,9 +1227,6 @@
                 realtimeChannel = null;
             }
             document.getElementById('loginForm').reset();
-            document.getElementById('loginUsername').value = '';
-            document.getElementById('loginPassword').value = '';
-            document.getElementById('loginStaffPersonalName').value = '';
             document.getElementById('officeStaffNameBox').classList.add('hidden');
             document.getElementById('loginErrorBox').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
@@ -1496,14 +1492,22 @@
                 }
             });
 
-            // إلغاء حفظ الجلسة تلقائياً: مسح أي جلسة سابقة وإلزام تسجيل الدخول في كل مرة يفتح فيها الرابط
-            localStorage.removeItem(SESSION_STORAGE_KEY);
-            currentUser = null;
-            document.getElementById('loginForm').reset();
-            document.getElementById('loginUsername').value = '';
-            document.getElementById('loginPassword').value = '';
-            document.getElementById('loginStaffPersonalName').value = '';
-            document.getElementById('officeStaffNameBox').classList.add('hidden');
+            // التحقق من وجود جلسة محفوظة (Session)
+            const savedSessionRaw = localStorage.getItem(SESSION_STORAGE_KEY);
+            if (savedSessionRaw) {
+                try {
+                    const parsedSession = JSON.parse(savedSessionRaw);
+                    if (parsedSession && parsedSession.username && parsedSession.displayName) {
+                        currentUser = parsedSession;
+                        await initializeAuthenticatedApp();
+                        return;
+                    }
+                } catch (e) {
+                    localStorage.removeItem(SESSION_STORAGE_KEY);
+                }
+            }
+
+            // إذا لم توجد جلسة، تبقى شاشة تسجيل الدخول ظاهرة
             document.getElementById('loginScreen').classList.remove('hidden');
         };
 
@@ -1876,9 +1880,9 @@
             if (projectId) {
                 const p = projects.find(item => item.id === projectId);
                 if (!p) return;
-                // تطبيق قاعدة الصلاحيات الصارمة: إذا كان المستخدم Limited والمشروع للـ Admin يمنع التعديل
+                // تطبيق قاعدة الصلاحيات الصارمة: إذا كان المستخدم Limited والمشروع للـ Admin يمنع فتح نافذة التعديل وتفتح نافذة تغيير الحالة فقط
                 if (!canFullEditProject(p)) {
-                    showToast('عذراً، هذا المشروع للإدارة وهو مقفل للتعديل (متاح لك تغيير الحالة فقط)', 'warning');
+                    openQuickStatusModal(projectId);
                     return;
                 }
             }
@@ -2600,14 +2604,14 @@
                             <div class="flex items-center gap-1.5 flex-wrap">
                                 <span class="inline-block px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-sky-600 dark:text-sky-400 font-extrabold text-xs num-en border border-slate-200 dark:border-slate-700">${p.quotationCode}</span>
                                 ${p.isUrgent ? `<span class="px-2.5 py-1 rounded-lg bg-gradient-to-r from-rose-600 to-orange-600 text-white text-[11px] font-black shadow-md shadow-rose-500/30 flex items-center gap-1 ${isActiveSuperUrgent ? 'super-badge-pulse' : ''}"><i class="fa-solid fa-fire-flame-curved"></i> مستعجل</span>` : ''}
-                                ${!hasFullAccess ? `<span class="px-2 py-0.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-bold border border-slate-300 dark:border-slate-700 flex items-center gap-1" title="للقراءة فقط - مسموح تغيير الحالة فقط"><i class="fa-solid fa-lock text-amber-500"></i> للقراءة فقط</span>` : ''}
+                                ${!hasFullAccess ? `<span class="px-2 py-0.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-bold border border-slate-300 dark:border-slate-700 flex items-center gap-1" title="مشروع للإدارة - متاح تغيير الحالة فقط"><i class="fa-solid fa-lock text-amber-500"></i> مقفل للتفاصيل</span>` : ''}
                                 ${!p.isUrgent && st.alertMsg ? `<span class="text-[11px] font-extrabold ${p.status === 'جديد' ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400'}"><i class="fa-solid fa-bell animate-bounce ml-0.5"></i> ${st.alertMsg}</span>` : ''}
                             </div>
                             <span class="px-3 py-1 rounded-full text-xs font-extrabold border flex items-center gap-1.5 shrink-0 ${st.badgeClass}"><i class="fa-solid ${st.icon}"></i><span>${p.status}</span></span>
                         </div>
 
                         <div>
-                            <h3 onclick="openDetailsModal('${p.id}')" class="text-base font-extrabold text-slate-800 dark:text-white hover:text-sky-500 cursor-pointer transition line-clamp-2">${p.projectName}</h3>
+                            <h3 ${hasFullAccess ? `onclick="openDetailsModal('${p.id}')"` : ''} class="text-base font-extrabold text-slate-800 dark:text-white ${hasFullAccess ? 'hover:text-sky-500 cursor-pointer' : 'cursor-default'} transition line-clamp-2">${p.projectName}</h3>
                             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5">
                                 <i class="fa-solid fa-location-dot text-rose-500"></i>
                                 <span class="font-semibold text-slate-700 dark:text-slate-300">${p.location || 'غير محدد'}</span>
@@ -2618,7 +2622,7 @@
                         <!-- عرض البنود مع أسعارها إذا كان التسعير المنفصل مفعلاً -->
                         <div class="flex flex-wrap gap-1.5">
                             ${(p.workTypes && p.workTypes.length > 0) ? p.workTypes.map(w => {
-                                const itemPrice = (p.isItemized && p.itemPrices && p.itemPrices[w] > 0) ? formatKWD(p.itemPrices[w]) : null;
+                                const itemPrice = (hasFullAccess && p.isItemized && p.itemPrices && p.itemPrices[w] > 0) ? formatKWD(p.itemPrices[w]) : null;
                                 return `
                                     <span class="px-2.5 py-1 rounded-md bg-sky-500/10 text-sky-700 dark:text-sky-300 text-[11px] font-bold border border-sky-500/20 inline-flex items-center gap-1.5">
                                         <span>${w}</span>
@@ -2644,13 +2648,14 @@
                             </div>
                         </div>
 
-                        ${(p.contacts && p.contacts.length > 0) ? `
+                        ${hasFullAccess && (p.contacts && p.contacts.length > 0) ? `
                         <div class="flex flex-wrap gap-1.5">
                             ${p.contacts.map(c => `<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20 text-[11px] font-semibold"><i class="fa-solid fa-phone text-[10px]"></i><span>${c.name || 'تواصل'}:</span>${c.phone ? `<a href="tel:${c.phone}" class="num-en font-bold underline hover:text-teal-500">${c.phone}</a>` : ''}</div>`).join('')}
                         </div>` : ''}
 
                         ${p.status === 'ملغي' && p.cancelReason ? `<div class="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-xs text-rose-700 dark:text-rose-300"><strong><i class="fa-solid fa-circle-info ml-1"></i> سبب الإلغاء:</strong> ${p.cancelReason}</div>` : ''}
 
+                        ${hasFullAccess ? `
                         <div class="p-3 rounded-xl bg-gradient-to-l from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-800/50 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
                             <div>
                                 <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">
@@ -2664,13 +2669,21 @@
                             </div>
                             ${p.submissionDate ? `<div class="text-left"><span class="text-[10px] text-slate-400 block">تاريخ التقديم</span><span class="text-xs font-bold num-en text-slate-600 dark:text-slate-300">${p.submissionDate}</span></div>` : ''}
                         </div>
+                        ` : `
+                        <div class="p-3 rounded-xl bg-slate-100/80 dark:bg-slate-800/40 border border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-amber-500"></i> التفاصيل والأسعار محمية</span>
+                            <button onclick="openQuickStatusModal('${p.id}')" class="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-bold text-[11px] transition cursor-pointer">
+                                تغيير الحالة
+                            </button>
+                        </div>
+                        `}
                     </div>
 
                     <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2">
                         <div class="text-[11px] text-slate-400"><span>آخر تحديث:</span> <span class="num-en font-semibold block sm:inline">${p.lastUpdated || ''}</span></div>
                         <div class="flex items-center gap-1.5">
-                            <button onclick="openDetailsModal('${p.id}')" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center transition cursor-pointer" title="عرض التفاصيل والطباعة"><i class="fa-solid fa-eye text-xs"></i></button>
                             ${hasFullAccess ? `
+                                <button onclick="openDetailsModal('${p.id}')" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center transition cursor-pointer" title="عرض التفاصيل"><i class="fa-solid fa-eye text-xs"></i></button>
                                 <button onclick="openProjectModal('${p.id}')" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-amber-500 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center transition cursor-pointer" title="تعديل"><i class="fa-solid fa-pen text-xs"></i></button>
                                 <button onclick="askDeleteProject('${p.id}')" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-red-600 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center transition cursor-pointer" title="حذف"><i class="fa-solid fa-trash-can text-xs"></i></button>
                             ` : `
@@ -2707,13 +2720,13 @@
                         ${p.isUrgent ? `<span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded bg-rose-600 text-white text-[10px] font-black"><i class="fa-solid fa-fire-flame-curved"></i> مستعجل</span>` : ''}
                     </td>
                     <td class="py-3.5 px-4 max-w-xs">
-                        <div onclick="openDetailsModal('${p.id}')" class="font-bold text-slate-800 dark:text-white hover:text-sky-500 cursor-pointer">${p.projectName}</div>
+                        <div ${hasFullAccess ? `onclick="openDetailsModal('${p.id}')"` : ''} class="font-bold text-slate-800 dark:text-white ${hasFullAccess ? 'hover:text-sky-500 cursor-pointer' : ''}">${p.projectName}</div>
                         <div class="text-xs text-slate-500 mt-0.5"><i class="fa-solid fa-location-dot text-rose-500 ml-1"></i>${p.location || '-'}</div>
                     </td>
                     <td class="py-3.5 px-4">
                         <div class="flex flex-wrap gap-1 max-w-[230px]">
                             ${(p.workTypes || []).map(w => {
-                                const itemPrice = (p.isItemized && p.itemPrices && p.itemPrices[w] > 0) ? formatKWD(p.itemPrices[w]) : null;
+                                const itemPrice = (hasFullAccess && p.isItemized && p.itemPrices && p.itemPrices[w] > 0) ? formatKWD(p.itemPrices[w]) : null;
                                 return `<span class="px-2 py-0.5 rounded bg-sky-500/10 text-sky-700 dark:text-sky-300 text-[11px] font-semibold">${w}${itemPrice ? ` (<span class="num-en font-bold">${itemPrice}</span>)` : ''}</span>`;
                             }).join('')}
                         </div>
@@ -2722,10 +2735,12 @@
                         <div class="font-bold text-slate-700 dark:text-slate-200">${(p.managers || []).join(' ، ') || '-'}</div>
                         ${p.assignedDate ? `<div class="num-en text-[11px] text-slate-400 mt-0.5">${p.assignedDate}</div>` : ''}
                     </td>
-                    <td class="py-3.5 px-4 text-xs">${(p.contacts || []).map(c => `<div>${c.name || ''}: <span class="num-en font-bold">${c.phone || ''}</span></div>`).join('') || '-'}</td>
+                    <td class="py-3.5 px-4 text-xs">${hasFullAccess ? ((p.contacts || []).map(c => `<div>${c.name || ''}: <span class="num-en font-bold">${c.phone || ''}</span></div>`).join('') || '-') : '<span class="text-slate-400"><i class="fa-solid fa-lock text-amber-500 ml-1"></i> محمي</span>'}</td>
                     <td class="py-3.5 px-4 whitespace-nowrap">
-                        <div class="font-black num-en text-slate-900 dark:text-white">${p.currentAmount > 0 ? formatKWD(p.currentAmount) : '-'}</div>
-                        ${hasRevisions ? `<div class="text-[10px] text-purple-500 font-bold">محدث (${p.priceHistory.length - 1})</div>` : ''}
+                        ${hasFullAccess ? `
+                            <div class="font-black num-en text-slate-900 dark:text-white">${p.currentAmount > 0 ? formatKWD(p.currentAmount) : '-'}</div>
+                            ${hasRevisions ? `<div class="text-[10px] text-purple-500 font-bold">محدث (${p.priceHistory.length - 1})</div>` : ''}
+                        ` : '<span class="text-xs text-slate-400"><i class="fa-solid fa-lock text-amber-500 ml-1"></i> محمي</span>'}
                     </td>
                     <td class="py-3.5 px-4 whitespace-nowrap">
                         <span class="px-2.5 py-1 rounded-full text-xs font-extrabold border inline-flex items-center gap-1.5 ${st.badgeClass}"><i class="fa-solid ${st.icon}"></i><span>${p.status}</span></span>
@@ -2737,8 +2752,8 @@
                     </td>
                     <td class="py-3.5 px-4 whitespace-nowrap text-center">
                         <div class="flex items-center justify-center gap-1">
-                            <button onclick="openDetailsModal('${p.id}')" class="p-2 rounded-lg hover:bg-sky-500/15 text-sky-500 cursor-pointer" title="تفاصيل وطباعة"><i class="fa-solid fa-eye"></i></button>
                             ${hasFullAccess ? `
+                                <button onclick="openDetailsModal('${p.id}')" class="p-2 rounded-lg hover:bg-sky-500/15 text-sky-500 cursor-pointer" title="تفاصيل"><i class="fa-solid fa-eye"></i></button>
                                 <button onclick="openProjectModal('${p.id}')" class="p-2 rounded-lg hover:bg-amber-500/15 text-amber-500 cursor-pointer" title="تعديل"><i class="fa-solid fa-pen"></i></button>
                                 <button onclick="askDeleteProject('${p.id}')" class="p-2 rounded-lg hover:bg-red-500/15 text-red-500 cursor-pointer" title="حذف"><i class="fa-solid fa-trash-can"></i></button>
                             ` : `
@@ -2756,6 +2771,11 @@
         function openDetailsModal(projectId) {
             const p = projects.find(item => item.id === projectId);
             if (!p) return;
+
+            if (!canFullEditProject(p)) {
+                showToast('عذراً، لا تملك صلاحية عرض التفاصيل الداخلية لهذا المشروع', 'error');
+                return;
+            }
 
             const st = STATUS_CONFIG[p.status] || STATUS_CONFIG['جديد'];
             const printArea = document.getElementById('printArea');
@@ -2815,7 +2835,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2">
                         <h4 class="text-xs font-extrabold text-sky-600 dark:text-sky-400">المسؤول عن المشروع وتاريخ الاستلام</h4>
-                        <p class="text-sm font-bold">${(p.managers && p.managers.length > 0) ? p.managers.join(' ، ') || 'غير محدد'}</p>
+                        <p class="text-sm font-bold">${(p.managers || []).join(' ، ') || 'غير محدد'}</p>
                         <p class="text-xs text-slate-500">تاريخ الاستلام: <span class="num-en font-semibold">${p.assignedDate || 'غير محدد'}</span></p>
                     </div>
 
@@ -2888,6 +2908,9 @@
             const priorityOrder = { 'جديد': 1, 'قيد التسعير': 2, 'تحديث عرض السعر': 3, 'تم تقديم العرض': 4, 'مرسي': 5, 'ملغي': 6 };
             
             const filtered = projects.filter(p => {
+                // إذا كان المستخدم محدود الصلاحية، يعرض في الطباعة فقط المشاريع التي يملك صلاحيتها أو التي أنشأها
+                if (!isAdminUser() && !canFullEditProject(p)) return false;
+
                 if (filterKey === 'SUPER_URGENT') {
                     return p.isUrgent && p.status !== 'مرسي' && p.status !== 'ملغي';
                 } else if (filterKey === 'URGENT') {
@@ -3177,13 +3200,14 @@
         }
 
         function exportToCSV() {
-            if (projects.length === 0) {
+            const allowedProjects = projects.filter(p => isAdminUser() || canFullEditProject(p));
+            if (allowedProjects.length === 0) {
                 showToast('لا توجد مشاريع متاحة لتصديرها حالياً', 'warning');
                 return;
             }
 
             const headers = ['كود المشروع', 'الأولوية', 'اسم المشروع', 'الموقع', 'تفاصيل الموقع', 'نوع الأعمال وتفصيل الأسعار', 'المسؤول عن المشروع', 'تاريخ الاستلام', 'جهات التواصل والأرقام', 'البريد الإلكتروني', 'تاريخ تقديم العرض', 'قيمة العرض الإجمالية (KWD)', 'وضع المشروع', 'سبب الإلغاء', 'عدد تحديثات السعر', 'بواسطة', 'آخر تحديث'];
-            const rows = projects.map(p => [
+            const rows = allowedProjects.map(p => [
                 p.quotationCode,
                 p.isUrgent ? 'مستعجل' : 'عادي',
                 p.projectName,
@@ -3220,7 +3244,8 @@
         }
 
         function exportJSONBackup() {
-            const backupData = { company: "شركة الراي الهندسية لتشييد و تشطيب المباني", exportedAt: new Date().toISOString(), projects: projects, kuwaitAreas, workTypes, savedManagers };
+            const allowedProjects = projects.filter(p => isAdminUser() || canFullEditProject(p));
+            const backupData = { company: "شركة الراي الهندسية لتشييد و تشطيب المباني", exportedAt: new Date().toISOString(), projects: allowedProjects, kuwaitAreas, workTypes, savedManagers };
             const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
