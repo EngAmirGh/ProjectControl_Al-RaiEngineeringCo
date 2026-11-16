@@ -13,6 +13,9 @@
     <!-- مكتبة الأيقونات FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
+    <!-- مكتبة Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -202,6 +205,74 @@
 </head>
 <body class="bg-slate-100 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-300 selection:bg-sky-500 selection:text-white">
 
+    <!-- =========================================================
+         شاشة تسجيل الدخول السحابية (Supabase Authentication)
+         ========================================================= -->
+    <div id="loginScreen" class="fixed inset-0 z-[200] bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-4 overflow-y-auto">
+        <div class="max-w-md w-full bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden my-6">
+            <div class="p-6 sm:p-8 bg-gradient-to-br from-sky-600 via-blue-700 to-indigo-900 text-white text-center relative overflow-hidden">
+                <div class="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 flex items-center justify-center mx-auto mb-3 shadow-lg">
+                    <i class="fa-solid fa-compass-drafting text-3xl text-white"></i>
+                </div>
+                <h1 class="text-xl font-black tracking-tight">شركة الراي الهندسية</h1>
+                <p class="text-xs text-sky-100 mt-1">لتشييد و تشطيب المباني • نظام إدارة التسعير السحابي</p>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="p-6 sm:p-8 space-y-5">
+                <div id="loginErrorBox" class="hidden p-3.5 rounded-2xl bg-red-500/15 border border-red-500/40 text-red-600 dark:text-red-400 text-xs font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-circle-exclamation text-base shrink-0"></i>
+                    <span id="loginErrorText"></span>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-extrabold text-slate-700 dark:text-slate-300 mb-1.5">
+                        اسم المستخدم <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="text" id="loginUsername" required oninput="onLoginUsernameInput()" autocomplete="username" placeholder="أدخل اسم المستخدم (مثلاً: admin أو Alrai_Office)" 
+                            class="w-full pr-10 pl-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm font-bold num-en text-right outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-extrabold text-slate-700 dark:text-slate-300 mb-1.5">
+                        كلمة المرور <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="password" id="loginPassword" required autocomplete="current-password" placeholder="••••••••" 
+                            class="w-full pr-10 pl-10 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm font-bold num-en text-right outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition">
+                        <button type="button" onclick="toggleLoginPasswordVisibility()" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-sky-500 cursor-pointer">
+                            <i id="loginPassEyeIcon" class="fa-solid fa-eye text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- خانة التعريف الشخصي لموظف المكتب (تظهر لحساب Alrai_Office أو عند طلبها لحساب Limited) -->
+                <div id="officeStaffNameBox" class="hidden p-4 rounded-2xl bg-amber-500/10 border-2 border-amber-500/40 space-y-2 transition-all">
+                    <label class="block text-xs font-extrabold text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+                        <i class="fa-solid fa-id-badge"></i>
+                        <span>اسم الموظف الشخصي (إلزامي لحساب المكتب) <span class="text-red-500">*</span></span>
+                    </label>
+                    <input type="text" id="loginStaffPersonalName" placeholder="اكتب اسمك الأول (مثلاً: سارة / أحمد)..." 
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-amber-400 text-sm font-bold outline-none focus:border-amber-500">
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400">سيظهر اسمك في النظام وسجل الحركات كـ: <strong class="text-amber-600 dark:text-amber-400">موظف المكتب (اسمك)</strong></p>
+                </div>
+
+                <button type="submit" id="loginSubmitBtn" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-extrabold text-sm shadow-lg shadow-sky-500/25 transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>تسجيل الدخول إلى النظام</span>
+                </button>
+
+                <div class="pt-2 text-center text-[11px] text-slate-400 flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-cloud-arrow-up text-sky-500"></i>
+                    <span>مربوط سحابياً ومزامن لحظياً عبر Supabase</span>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- حاوية الإشعارات المنبثقة (Toast Notifications) -->
     <div id="toastContainer" class="fixed bottom-5 left-5 z-[100] flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
 
@@ -223,9 +294,15 @@
                             <span class="px-2.5 py-0.5 text-xs font-bold rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
                                 نظام إدارة التسعير والمشاريع
                             </span>
+                            <!-- مؤشر حالة المزامنة السحابية -->
+                            <span id="cloudSyncBadge" class="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span id="cloudSyncText">متصل سحابياً</span>
+                            </span>
                         </div>
-                        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-2">
-                            <span>أهلاً بك، <strong class="text-slate-800 dark:text-slate-200">المهندس أمير</strong></span>
+                        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-2 flex-wrap">
+                            <span>أهلاً بك، <strong id="headerUserDisplayName" class="text-slate-800 dark:text-slate-200">المهندس أمير</strong></span>
+                            <span id="headerRoleBadge" class="px-2 py-0.2 rounded-md text-[10px] font-extrabold bg-sky-500/15 text-sky-600 dark:text-sky-400 border border-sky-500/30">Admin</span>
                             <span class="text-slate-300 dark:text-slate-700">|</span>
                             <span id="liveClock" class="num-en text-xs text-sky-600 dark:text-sky-400 font-semibold"></span>
                         </p>
@@ -239,12 +316,18 @@
                         <span>مشروع / عرض سعر جديد</span>
                     </button>
 
-                    <button onclick="openAllProjectsPrintModal()" class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition-all cursor-pointer" title="طباعة تقرير كامل لجميع المشاريع">
-                        <i class="fa-solid fa-print text-sky-500"></i>
-                        <span class="hidden sm:inline">طباعة كل المشاريع</span>
+                    <!-- زر سجل الحركات (يظهر للمدير Admin فقط) -->
+                    <button id="btnActivityLogs" onclick="openActivityLogsModal()" class="hidden flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-indigo-600/15 hover:bg-indigo-600/25 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30 font-bold text-sm transition-all cursor-pointer" title="سجل حركات النظام والموظفين">
+                        <i class="fa-solid fa-clock-rotate-left text-indigo-500"></i>
+                        <span class="hidden sm:inline">سجل الحركات</span>
                     </button>
 
-                    <button onclick="openSettingsModal()" class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition-all cursor-pointer" title="إدارة الأعمال والمناطق والمسؤولين">
+                    <button onclick="openAllProjectsPrintModal()" class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition-all cursor-pointer" title="طباعة أو تصدير PDF حسب التصنيف">
+                        <i class="fa-solid fa-print text-sky-500"></i>
+                        <span class="hidden sm:inline">طباعة / PDF</span>
+                    </button>
+
+                    <button id="btnManageLists" onclick="openSettingsModal()" class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition-all cursor-pointer" title="إدارة الأعمال والمناطق والمسؤولين">
                         <i class="fa-solid fa-sliders text-sky-500"></i>
                         <span class="hidden sm:inline">إدارة القوائم</span>
                     </button>
@@ -264,7 +347,7 @@
                                 <i class="fa-solid fa-download text-sky-500 w-4"></i>
                                 <span>نسخة احتياطية (JSON)</span>
                             </button>
-                            <label class="w-full text-right px-4 py-2.5 text-sm hover:bg-slate-100 dark:hover:bg-slate-700/70 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 cursor-pointer">
+                            <label id="importBackupLabel" class="w-full text-right px-4 py-2.5 text-sm hover:bg-slate-100 dark:hover:bg-slate-700/70 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 cursor-pointer">
                                 <i class="fa-solid fa-upload text-amber-500 w-4"></i>
                                 <span>استعادة نسخة (JSON)</span>
                                 <input type="file" accept=".json" onchange="importJSONBackup(event); toggleBackupMenu()" class="hidden">
@@ -274,6 +357,12 @@
 
                     <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 flex items-center justify-center text-slate-700 dark:text-amber-400 transition-all cursor-pointer" title="تبديل الوضع الليلي / النهاري">
                         <i id="themeIcon" class="fa-solid fa-sun text-lg"></i>
+                    </button>
+
+                    <!-- زر تسجيل الخروج -->
+                    <button onclick="logoutUser()" class="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-rose-500/15 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white border border-rose-500/30 font-bold text-sm transition-all cursor-pointer" title="تسجيل الخروج من الحساب">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span class="hidden md:inline">تسجيل خروج</span>
                     </button>
                 </div>
             </div>
@@ -432,7 +521,7 @@
                                 <th class="py-3.5 px-4">التواصل</th>
                                 <th class="py-3.5 px-4">إجمالي العرض (KWD)</th>
                                 <th class="py-3.5 px-4">الوضع والتنبيه</th>
-                                <th class="py-3.5 px-4">آخر تحديث</th>
+                                <th class="py-3.5 px-4">المُسجِّل والتحديث</th>
                                 <th class="py-3.5 px-4 text-center">إجراءات</th>
                             </tr>
                         </thead>
@@ -564,7 +653,7 @@
                                 <span>إضافة نوع عمل جديد</span>
                             </button>
                             <span class="text-slate-300 dark:text-slate-700">|</span>
-                            <button type="button" onclick="openSettingsModal('works')" class="text-xs font-bold text-slate-500 hover:text-sky-500 cursor-pointer">
+                            <button type="button" id="btnEditWorkTypesInModal" onclick="openSettingsModal('works')" class="text-xs font-bold text-slate-500 hover:text-sky-500 cursor-pointer">
                                 <i class="fa-solid fa-pen-to-square"></i> تعديل القائمة
                             </button>
                         </div>
@@ -761,22 +850,37 @@
         </div>
     </div>
 
-    <!-- نافذة طباعة كل المشاريع -->
+    <!-- نافذة طباعة / إرسال PDF مع خيارات التصفية الذكية -->
     <div id="allProjectsPrintModal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-sm overflow-y-auto p-3 sm:p-6">
         <div class="max-w-5xl mx-auto bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden my-4">
-            <div class="px-6 py-4 bg-slate-800 text-white flex items-center justify-between no-print">
+            <div class="px-6 py-4 bg-slate-800 text-white flex flex-wrap items-center justify-between gap-3 no-print">
                 <h3 class="font-extrabold text-base flex items-center gap-2">
                     <i class="fa-solid fa-print text-sky-400"></i>
-                    <span>تقرير طباعة جميع المشاريع وعروض الأسعار</span>
+                    <span>طباعة وتصدير PDF للمشاريع وعروض الأسعار</span>
                 </h3>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center flex-wrap gap-2">
+                    <button onclick="sharePrintReportSummary()" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer" title="نسخ أو مشاركة ملخص القائمة للإرسال">
+                        <i class="fa-solid fa-share-nodes"></i>
+                        <span>مشاركة / نسخ للإرسال</span>
+                    </button>
                     <button onclick="printAllProjectsAction()" class="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer">
                         <i class="fa-solid fa-print"></i>
-                        <span>طباعة الكل / PDF</span>
+                        <span id="printActionBtnText">طباعة / حفظ PDF</span>
                     </button>
                     <button onclick="closeAllProjectsPrintModal()" class="w-8 h-8 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center text-white cursor-pointer">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
+                </div>
+            </div>
+
+            <!-- شريط اختيار نوع المشاريع المراد طباعتها أو إرسالها PDF -->
+            <div class="px-6 py-3.5 bg-slate-100 dark:bg-slate-800/90 border-b border-slate-200 dark:border-slate-700 no-print space-y-2">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-300">
+                    <span><i class="fa-solid fa-filter text-sky-500 ml-1"></i> اختر الفئة المطلوب طباعتها أو حفظها كملف PDF للإرسال:</span>
+                    <span id="printFilterCountLabel" class="text-sky-600 dark:text-sky-400"></span>
+                </div>
+                <div id="printFilterButtonsContainer" class="flex items-center gap-2 overflow-x-auto pb-1">
+                    <!-- الأزرار تتولد ديناميكياً -->
                 </div>
             </div>
 
@@ -836,6 +940,87 @@
         </div>
     </div>
 
+    <!-- نافذة سجل الحركات للمدير (Activity Logs Modal - Admin Only) -->
+    <div id="activityLogsModal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-sm overflow-y-auto p-3 sm:p-6">
+        <div class="max-w-4xl mx-auto bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden my-6">
+            <div class="px-6 py-4 bg-gradient-to-l from-indigo-600 to-slate-900 text-white flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-clock-rotate-left text-xl text-indigo-300"></i>
+                    <div>
+                        <h3 class="font-extrabold text-base">سجل حركات النظام والموظفين (Activity Logs)</h3>
+                        <p class="text-xs text-indigo-200">مرتب من الأحدث للأقدم • متاح للمدير العام فقط</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="fetchActivityLogs()" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer" title="تحديث السجل">
+                        <i class="fa-solid fa-rotate"></i>
+                        <span>تحديث</span>
+                    </button>
+                    <button onclick="closeActivityLogsModal()" class="w-8 h-8 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center text-white cursor-pointer">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
+                    <span>يعرض جميع عمليات الإضافة، التعديل، تغيير الحالة، والحذف المسجلة سحابياً.</span>
+                    <span id="logsCountLabel" class="font-bold text-indigo-600 dark:text-indigo-400"></span>
+                </div>
+
+                <div id="activityLogsContainer" class="space-y-2.5 max-h-[60vh] overflow-y-auto pr-1">
+                    <!-- يتم تحميل السجلات من Supabase هنا -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة تغيير الحالة السريع للمستخدم المحدود (للمشاريع المقفلة الخاصة بالمدير) -->
+    <div id="quickStatusModal" class="fixed inset-0 z-[60] hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h3 class="text-base font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-arrows-rotate text-sky-500"></i>
+                    <span>تحديث حالة المشروع فقط</span>
+                </h3>
+                <button onclick="closeQuickStatusModal()" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-700 dark:text-amber-300 space-y-1">
+                <div class="font-extrabold flex items-center gap-1.5">
+                    <i class="fa-solid fa-lock"></i>
+                    <span>مشروع مسجل بواسطة الإدارة</span>
+                </div>
+                <p>صلاحياتك تسمح بتغيير <strong>حالة المشروع فقط</strong> دون فتح أو تعديل تفاصيله الداخلية.</p>
+            </div>
+
+            <div>
+                <div id="quickStatusProjectInfo" class="text-xs font-bold text-slate-700 dark:text-slate-200 mb-3"></div>
+                <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5">اختر الحالة الجديدة:</label>
+                <select id="quickStatusSelect" onchange="toggleQuickStatusCancelBox()" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm font-bold outline-none focus:border-sky-500 cursor-pointer">
+                    <option value="جديد">🔴 جديد (لم يُسعّر بعد)</option>
+                    <option value="قيد التسعير">🟡 قيد التسعير</option>
+                    <option value="تم تقديم العرض">🔵 تم تقديم العرض</option>
+                    <option value="تحديث عرض السعر">🟣 تحديث عرض السعر</option>
+                    <option value="مرسي">🟢 مرسي</option>
+                    <option value="ملغي">⚫ ملغي</option>
+                </select>
+            </div>
+
+            <div id="quickStatusCancelReasonBox" class="hidden space-y-1.5">
+                <label class="block text-xs font-bold text-rose-600 dark:text-rose-400">سبب الإلغاء (إلزامي):</label>
+                <textarea id="quickStatusCancelReason" rows="2" placeholder="اكتب سبب الإلغاء..." class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-rose-400 text-xs outline-none"></textarea>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-2">
+                <button onclick="closeQuickStatusModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs cursor-pointer">إلغاء</button>
+                <button onclick="saveQuickStatusChange()" class="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-lg shadow-sky-500/20 cursor-pointer">حفظ الحالة الجديدة</button>
+            </div>
+        </div>
+    </div>
+
     <!-- نافذة تأكيد الحذف -->
     <div id="confirmDeleteModal" class="fixed inset-0 z-[60] hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="max-w-md w-full bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 shadow-2xl text-center space-y-4">
@@ -851,8 +1036,20 @@
         </div>
     </div>
 
-    <!-- البرمجة والمنطق الهندسي المتكامل (JavaScript) -->
+    <!-- البرمجة والمنطق الهندسي المتكامل (JavaScript + Supabase Cloud Sync) -->
     <script>
+        // ============================================================
+        // 1. إعدادات الاتصال بقاعدة بيانات Supabase
+        // ============================================================
+        const SUPABASE_URL = 'https://agvtoxatyuqytdlsnmda.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_Pt3GuNZ6-95aZO76_rCSOg_pRYS0DZo';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const SESSION_STORAGE_KEY = 'alrai_eng_auth_session_v1';
+        let currentUser = null; // { id, username, baseFullName, displayName, role: 'Admin' | 'Limited' }
+        let realtimeChannel = null;
+        let isApplyingRemoteSync = false;
+
         const DEFAULT_KUWAIT_AREAS = [
             "مدينة الكويت", "شرق", "المرقاب", "القبلة", "الصالحية", "بنيد القار", "الدسمة", "الدعية", "المنصورية",
             "عبدالله السالم", "النزهة", "الفيحاء", "الشامية", "الروضة", "العديلية", "الخالدية", "القادسية",
@@ -892,21 +1089,395 @@
         let savedManagers = JSON.parse(localStorage.getItem(STORAGE_KEYS.MANAGERS)) || ["م. أمير"];
         
         let currentFilterStatus = 'ALL';
+        let currentPrintFilter = 'ALL'; // الفلتر المحدد داخل نافذة الطباعة / PDF
         let currentViewMode = localStorage.getItem(STORAGE_KEYS.VIEW_MODE) || 'cards';
         let tempSelectedManagers = [];
         let tempContacts = [];
         let tempItemPrices = {}; // لتخزين أسعار كل بند أثناء التعديل/الإضافة
 
-        window.onload = function() {
-            initTheme();
-            updateLiveClock();
-            setInterval(updateLiveClock, 1000);
-            
+        // ============================================================
+        // 2. دوال الصلاحيات والتسجيل السحابي والمزامنة
+        // ============================================================
+        function isAdminUser() {
+            return currentUser && String(currentUser.role).toLowerCase() === 'admin';
+        }
+
+        function canFullEditProject(p) {
+            if (!currentUser || !p) return false;
+            if (isAdminUser()) return true;
+            // المستخدم المحدود (Limited) يملك كامل الصلاحية فقط على المشاريع التي أنشأها هو (ليست من Admin)
+            const creatorRole = String(p.creatorRole || 'Admin').toLowerCase();
+            if (creatorRole === 'admin') return false;
+            // التحقق من تطابق الحساب أو الاسم
+            if (p.createdByUsername && currentUser.username) {
+                return String(p.createdByUsername).toLowerCase() === String(currentUser.username).toLowerCase();
+            }
+            return p.createdBy === currentUser.displayName;
+        }
+
+        function onLoginUsernameInput() {
+            const val = document.getElementById('loginUsername').value.trim().toLowerCase();
+            const staffBox = document.getElementById('officeStaffNameBox');
+            const staffInput = document.getElementById('loginStaffPersonalName');
+            if (val === 'alrai_office' || (val !== '' && val !== 'admin')) {
+                staffBox.classList.remove('hidden');
+                if (val === 'alrai_office') {
+                    staffInput.setAttribute('required', 'required');
+                } else {
+                    staffInput.removeAttribute('required');
+                }
+            } else {
+                staffBox.classList.add('hidden');
+                staffInput.removeAttribute('required');
+            }
+        }
+
+        function toggleLoginPasswordVisibility() {
+            const passInput = document.getElementById('loginPassword');
+            const icon = document.getElementById('loginPassEyeIcon');
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                icon.className = 'fa-solid fa-eye-slash text-sm';
+            } else {
+                passInput.type = 'password';
+                icon.className = 'fa-solid fa-eye text-sm';
+            }
+        }
+
+        async function handleLoginSubmit(event) {
+            event.preventDefault();
+            const usernameInput = document.getElementById('loginUsername').value.trim();
+            const passwordInput = document.getElementById('loginPassword').value;
+            const personalNameInput = document.getElementById('loginStaffPersonalName').value.trim();
+            const errorBox = document.getElementById('loginErrorBox');
+            const errorText = document.getElementById('loginErrorText');
+            const submitBtn = document.getElementById('loginSubmitBtn');
+
+            errorBox.classList.add('hidden');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>جاري التحقق السحابي...</span>`;
+
+            try {
+                // جلب المستخدمين من جدول app_users ومقارنة اسم المستخدم مع تجاهل حالة الأحرف
+                const { data: users, error } = await supabaseClient
+                    .from('app_users')
+                    .select('*');
+
+                if (error) throw error;
+
+                const matchedUser = (users || []).find(u => 
+                    String(u.username || '').trim().toLowerCase() === usernameInput.toLowerCase() &&
+                    String(u.password || '') === passwordInput
+                );
+
+                if (!matchedUser) {
+                    errorText.textContent = 'اسم المستخدم أو كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى.';
+                    errorBox.classList.remove('hidden');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> <span>تسجيل الدخول إلى النظام</span>`;
+                    return;
+                }
+
+                const normalizedRole = String(matchedUser.role || '').trim().toLowerCase() === 'admin' ? 'Admin' : 'Limited';
+
+                if (normalizedRole === 'Limited' && !personalNameInput) {
+                    document.getElementById('officeStaffNameBox').classList.remove('hidden');
+                    document.getElementById('loginStaffPersonalName').focus();
+                    errorText.textContent = 'يرجى إدخال اسمك الشخصي في الخانة المخصصة لموظف المكتب.';
+                    errorBox.classList.remove('hidden');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> <span>تسجيل الدخول إلى النظام</span>`;
+                    return;
+                }
+
+                const baseName = matchedUser.full_name || (normalizedRole === 'Admin' ? 'م. أمير' : 'موظف المكتب');
+                const finalDisplayName = normalizedRole === 'Limited' 
+                    ? `${baseName} (${personalNameInput})` 
+                    : baseName;
+
+                currentUser = {
+                    id: matchedUser.id,
+                    username: matchedUser.username,
+                    baseFullName: baseName,
+                    displayName: finalDisplayName,
+                    role: normalizedRole
+                };
+
+                localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
+                await initializeAuthenticatedApp();
+                showToast(`مرحباً بك، ${currentUser.displayName}`, 'success');
+            } catch (err) {
+                console.error('Login error:', err);
+                errorText.textContent = 'تعذر الاتصال بقاعدة البيانات السحابية. تأكد من الاتصال بالإنترنت.';
+                errorBox.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> <span>تسجيل الدخول إلى النظام</span>`;
+            }
+        }
+
+        function logoutUser() {
+            localStorage.removeItem(SESSION_STORAGE_KEY);
+            currentUser = null;
+            if (realtimeChannel) {
+                supabaseClient.removeChannel(realtimeChannel);
+                realtimeChannel = null;
+            }
+            document.getElementById('loginForm').reset();
+            document.getElementById('officeStaffNameBox').classList.add('hidden');
+            document.getElementById('loginErrorBox').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            showToast('تم تسجيل الخروج بنجاح', 'info');
+        }
+
+        function applyRoleBasedUI() {
+            if (!currentUser) return;
+            document.getElementById('headerUserDisplayName').textContent = currentUser.displayName;
+            const roleBadge = document.getElementById('headerRoleBadge');
+            const btnActivityLogs = document.getElementById('btnActivityLogs');
+            const btnManageLists = document.getElementById('btnManageLists');
+            const btnEditWorkTypesInModal = document.getElementById('btnEditWorkTypesInModal');
+            const importBackupLabel = document.getElementById('importBackupLabel');
+
+            if (isAdminUser()) {
+                roleBadge.textContent = 'مدير النظام (Admin)';
+                roleBadge.className = 'px-2 py-0.2 rounded-md text-[10px] font-extrabold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30';
+                btnActivityLogs.classList.remove('hidden');
+                btnManageLists.classList.remove('hidden');
+                if (btnEditWorkTypesInModal) btnEditWorkTypesInModal.classList.remove('hidden');
+                if (importBackupLabel) importBackupLabel.classList.remove('hidden');
+            } else {
+                roleBadge.textContent = 'حساب مكتب (Limited)';
+                roleBadge.className = 'px-2 py-0.2 rounded-md text-[10px] font-extrabold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30';
+                btnActivityLogs.classList.add('hidden');
+                btnManageLists.classList.add('hidden');
+                if (btnEditWorkTypesInModal) btnEditWorkTypesInModal.classList.add('hidden');
+                if (importBackupLabel) importBackupLabel.classList.add('hidden');
+            }
+        }
+
+        function setCloudSyncStatus(state, text) {
+            const badge = document.getElementById('cloudSyncBadge');
+            const label = document.getElementById('cloudSyncText');
+            if (!badge || !label) return;
+            label.textContent = text;
+            if (state === 'syncing') {
+                badge.className = 'px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center gap-1.5';
+            } else if (state === 'error') {
+                badge.className = 'px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/30 flex items-center gap-1.5';
+            } else {
+                badge.className = 'px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5';
+            }
+        }
+
+        // جلب حالة النظام من Supabase system_state ومزامنتها
+        async function loadSystemStateFromSupabase() {
+            setCloudSyncStatus('syncing', 'جاري المزامنة...');
+            try {
+                const { data, error } = await supabaseClient
+                    .from('system_state')
+                    .select('*')
+                    .limit(1);
+
+                if (error) throw error;
+
+                if (data && data.length > 0 && data[0].data) {
+                    const remoteState = data[0].data;
+                    window.__systemStateRowId = data[0].id;
+                    isApplyingRemoteSync = true;
+                    if (Array.isArray(remoteState.projects)) {
+                        projects = remoteState.projects;
+                    }
+                    if (Array.isArray(remoteState.kuwaitAreas) && remoteState.kuwaitAreas.length > 0) {
+                        kuwaitAreas = remoteState.kuwaitAreas;
+                    }
+                    if (Array.isArray(remoteState.workTypes) && remoteState.workTypes.length > 0) {
+                        workTypes = remoteState.workTypes;
+                    }
+                    if (Array.isArray(remoteState.savedManagers) && remoteState.savedManagers.length > 0) {
+                        savedManagers = remoteState.savedManagers;
+                    }
+                    saveLocalCacheOnly();
+                    isApplyingRemoteSync = false;
+                } else {
+                    // إذا كان الجدول فارغاً أول مرة، نرفع البيانات الحالية (إن وجدت) لإنشاء السجل الأول
+                    window.__systemStateRowId = 1;
+                    await pushSystemStateToSupabase();
+                }
+
+                setCloudSyncStatus('connected', 'متصل ومزامن سحابياً');
+            } catch (err) {
+                console.error('Supabase load error:', err);
+                setCloudSyncStatus('error', 'وضع محلي (تعذر الربط)');
+            }
+        }
+
+        async function pushSystemStateToSupabase() {
+            if (isApplyingRemoteSync || !currentUser) return;
+            setCloudSyncStatus('syncing', 'جاري الحفظ سحابياً...');
+            try {
+                const payload = {
+                    projects,
+                    kuwaitAreas,
+                    workTypes,
+                    savedManagers
+                };
+
+                const rowId = window.__systemStateRowId || 1;
+                const { error } = await supabaseClient
+                    .from('system_state')
+                    .upsert({
+                        id: rowId,
+                        data: payload,
+                        updated_at: new Date().toISOString(),
+                        updated_by: currentUser.displayName
+                    }, { onConflict: 'id' });
+
+                if (error) throw error;
+                setCloudSyncStatus('connected', 'متصل ومزامن سحابياً');
+            } catch (err) {
+                console.error('Supabase save error:', err);
+                setCloudSyncStatus('error', 'خطأ في المزامنة');
+                showToast('تنبيه: تم الحفظ محلياً لكن تعذرت المزامنة السحابية', 'warning');
+            }
+        }
+
+        function subscribeToSystemStateRealtime() {
+            if (realtimeChannel) {
+                supabaseClient.removeChannel(realtimeChannel);
+            }
+            realtimeChannel = supabaseClient
+                .channel('public:system_state')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'system_state' }, (payload) => {
+                    if (payload.new && payload.new.data) {
+                        const remoteState = payload.new.data;
+                        window.__systemStateRowId = payload.new.id;
+                        isApplyingRemoteSync = true;
+                        if (Array.isArray(remoteState.projects)) projects = remoteState.projects;
+                        if (Array.isArray(remoteState.kuwaitAreas)) kuwaitAreas = remoteState.kuwaitAreas;
+                        if (Array.isArray(remoteState.workTypes)) workTypes = remoteState.workTypes;
+                        if (Array.isArray(remoteState.savedManagers)) savedManagers = remoteState.savedManagers;
+                        saveLocalCacheOnly();
+                        populateYearFilter();
+                        populateManagerFilter();
+                        renderStatusFilterTabs();
+                        renderProjects();
+                        isApplyingRemoteSync = false;
+                        setCloudSyncStatus('connected', 'مُحدّث لحظياً');
+                    }
+                })
+                .subscribe();
+        }
+
+        // تسجيل الحركات في جدول activity_logs في Supabase
+        async function logActivity(actionType, details) {
+            if (!currentUser) return;
+            try {
+                await supabaseClient
+                    .from('activity_logs')
+                    .insert([{
+                        user_name: currentUser.displayName,
+                        action_type: actionType,
+                        details: details,
+                        created_at: new Date().toISOString()
+                    }]);
+            } catch (err) {
+                console.error('Activity log error:', err);
+            }
+        }
+
+        async function openActivityLogsModal() {
+            if (!isAdminUser()) {
+                showToast('عذراً، سجل الحركات متاح للمدير العام فقط', 'error');
+                return;
+            }
+            document.getElementById('activityLogsModal').classList.remove('hidden');
+            await fetchActivityLogs();
+        }
+
+        function closeActivityLogsModal() {
+            document.getElementById('activityLogsModal').classList.add('hidden');
+        }
+
+        async function fetchActivityLogs() {
+            const container = document.getElementById('activityLogsContainer');
+            const countLabel = document.getElementById('logsCountLabel');
+            container.innerHTML = `<div class="py-10 text-center text-sm text-slate-400"><i class="fa-solid fa-spinner fa-spin ml-2"></i> جاري تحميل سجل الحركات من السحابة...</div>`;
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('activity_logs')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(150);
+
+                if (error) throw error;
+
+                const logs = data || [];
+                countLabel.textContent = `إجمالي السجلات المعروضة: ${logs.length}`;
+
+                if (logs.length === 0) {
+                    container.innerHTML = `<div class="py-10 text-center text-sm text-slate-400">لا توجد حركات مسجلة في السجل حتى الآن.</div>`;
+                    return;
+                }
+
+                const actionStyles = {
+                    'إضافة': { bg: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30', icon: 'fa-plus-circle' },
+                    'تعديل': { bg: 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30', icon: 'fa-pen-to-square' },
+                    'تغيير حالة': { bg: 'bg-sky-500/15 text-sky-600 dark:text-sky-400 border-sky-500/30', icon: 'fa-arrows-rotate' },
+                    'حذف': { bg: 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30', icon: 'fa-trash-can' }
+                };
+
+                container.innerHTML = logs.map(log => {
+                    const style = actionStyles[log.action_type] || { bg: 'bg-slate-500/15 text-slate-600 dark:text-slate-300 border-slate-500/30', icon: 'fa-circle-info' };
+                    const dt = log.created_at ? new Date(log.created_at) : null;
+                    const formattedTime = dt && !isNaN(dt.getTime()) 
+                        ? `${dt.toLocaleDateString('en-GB')} - ${dt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}`
+                        : '';
+
+                    return `
+                        <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="px-2.5 py-0.5 rounded-lg text-[11px] font-extrabold border inline-flex items-center gap-1 ${style.bg}">
+                                        <i class="fa-solid ${style.icon}"></i>
+                                        <span>${log.action_type || 'حركة'}</span>
+                                    </span>
+                                    <span class="text-xs font-extrabold text-slate-800 dark:text-white flex items-center gap-1">
+                                        <i class="fa-solid fa-user-check text-sky-500 text-[11px]"></i>
+                                        <span>${log.user_name || 'غير معروف'}</span>
+                                    </span>
+                                </div>
+                                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${log.details || ''}</p>
+                            </div>
+                            <div class="text-left shrink-0">
+                                <span class="num-en text-[11px] font-semibold text-slate-400">${formattedTime}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error('Fetch logs error:', err);
+                container.innerHTML = `<div class="py-8 text-center text-xs text-rose-500 font-bold">حدث خطأ أثناء جلب سجل الحركات من Supabase.</div>`;
+            }
+        }
+
+        async function initializeAuthenticatedApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            applyRoleBasedUI();
+            await loadSystemStateFromSupabase();
+            subscribeToSystemStateRealtime();
             populateYearFilter();
             populateManagerFilter();
             renderStatusFilterTabs();
             switchViewMode(currentViewMode, false);
             renderProjects();
+        }
+
+        window.onload = async function() {
+            initTheme();
+            updateLiveClock();
+            setInterval(updateLiveClock, 1000);
 
             document.getElementById('assignedDate').addEventListener('change', updateAssignedDatePreview);
             
@@ -917,13 +1488,36 @@
                     dropdown.classList.add('hidden');
                 }
             });
+
+            // التحقق من وجود جلسة محفوظة (Session)
+            const savedSessionRaw = localStorage.getItem(SESSION_STORAGE_KEY);
+            if (savedSessionRaw) {
+                try {
+                    const parsedSession = JSON.parse(savedSessionRaw);
+                    if (parsedSession && parsedSession.username && parsedSession.displayName) {
+                        currentUser = parsedSession;
+                        await initializeAuthenticatedApp();
+                        return;
+                    }
+                } catch (e) {
+                    localStorage.removeItem(SESSION_STORAGE_KEY);
+                }
+            }
+
+            // إذا لم توجد جلسة، تبقى شاشة تسجيل الدخول ظاهرة
+            document.getElementById('loginScreen').classList.remove('hidden');
         };
 
-        function saveAllToStorage() {
+        function saveLocalCacheOnly() {
             localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
             localStorage.setItem(STORAGE_KEYS.LOCATIONS, JSON.stringify(kuwaitAreas));
             localStorage.setItem(STORAGE_KEYS.WORK_TYPES, JSON.stringify(workTypes));
             localStorage.setItem(STORAGE_KEYS.MANAGERS, JSON.stringify(savedManagers));
+        }
+
+        function saveAllToStorage() {
+            saveLocalCacheOnly();
+            pushSystemStateToSupabase();
         }
 
         function updateLiveClock() {
@@ -1208,8 +1802,88 @@
             showToast(`تمت إضافة منطقة "${newLoc}" وحفظها في القائمة`, 'success');
         }
 
+        // ============================================================
+        // نافذة التعديل السريع للحالة فقط (للمستخدم Limited على مشاريع Admin)
+        // ============================================================
+        let quickStatusTargetId = null;
+
+        function openQuickStatusModal(projectId) {
+            const p = projects.find(item => item.id === projectId);
+            if (!p) return;
+            quickStatusTargetId = projectId;
+
+            document.getElementById('quickStatusProjectInfo').innerHTML = `
+                <span class="num-en text-sky-600 dark:text-sky-400">${p.quotationCode}</span> — ${p.projectName}
+            `;
+            document.getElementById('quickStatusSelect').value = p.status || 'جديد';
+            document.getElementById('quickStatusCancelReason').value = p.cancelReason || '';
+            toggleQuickStatusCancelBox();
+            document.getElementById('quickStatusModal').classList.remove('hidden');
+        }
+
+        function closeQuickStatusModal() {
+            document.getElementById('quickStatusModal').classList.add('hidden');
+            quickStatusTargetId = null;
+        }
+
+        function toggleQuickStatusCancelBox() {
+            const val = document.getElementById('quickStatusSelect').value;
+            const box = document.getElementById('quickStatusCancelReasonBox');
+            if (val === 'ملغي') {
+                box.classList.remove('hidden');
+            } else {
+                box.classList.add('hidden');
+            }
+        }
+
+        async function saveQuickStatusChange() {
+            if (!quickStatusTargetId) return;
+            const idx = projects.findIndex(p => p.id === quickStatusTargetId);
+            if (idx === -1) return;
+
+            const oldProj = projects[idx];
+            const newStatus = document.getElementById('quickStatusSelect').value;
+            const cancelReason = document.getElementById('quickStatusCancelReason').value.trim();
+
+            if (newStatus === 'ملغي' && !cancelReason) {
+                showToast('يرجى كتابة سبب إلغاء المشروع!', 'error');
+                document.getElementById('quickStatusCancelReason').focus();
+                return;
+            }
+
+            const oldStatus = oldProj.status;
+            const nowIso = new Date().toISOString().slice(0, 10);
+
+            projects[idx] = {
+                ...oldProj,
+                status: newStatus,
+                cancelReason: newStatus === 'ملغي' ? cancelReason : '',
+                lastUpdated: nowIso
+            };
+
+            saveAllToStorage();
+            renderStatusFilterTabs();
+            renderProjects();
+            closeQuickStatusModal();
+            showToast(`تم تغيير حالة المشروع ${oldProj.quotationCode} إلى "${newStatus}"`, 'success');
+
+            if (oldStatus !== newStatus) {
+                await logActivity('تغيير حالة', `تغيير حالة المشروع (${oldProj.quotationCode} - ${oldProj.projectName}) من "${oldStatus}" إلى "${newStatus}"`);
+            }
+        }
+
         // إدارة نافذة إضافة / تعديل مشروع
         function openProjectModal(projectId = null) {
+            if (projectId) {
+                const p = projects.find(item => item.id === projectId);
+                if (!p) return;
+                // تطبيق قاعدة الصلاحيات الصارمة: إذا كان المستخدم Limited والمشروع للـ Admin يمنع فتح نافذة التعديل وتفتح نافذة تغيير الحالة فقط
+                if (!canFullEditProject(p)) {
+                    openQuickStatusModal(projectId);
+                    return;
+                }
+            }
+
             const modal = document.getElementById('projectModal');
             const form = document.getElementById('projectForm');
             form.reset();
@@ -1495,10 +2169,19 @@
         }
 
         // حفظ المشروع
-        function saveProject(event) {
+        async function saveProject(event) {
             event.preventDefault();
 
             const editId = document.getElementById('editProjectId').value;
+
+            if (editId) {
+                const targetProj = projects.find(p => p.id === editId);
+                if (!targetProj || !canFullEditProject(targetProj)) {
+                    showToast('ليس لديك صلاحية لتعديل تفاصيل هذا المشروع', 'error');
+                    return;
+                }
+            }
+
             const quotationCode = document.getElementById('quotationCode').value.trim();
             const projectName = document.getElementById('projectName').value.trim();
             const isUrgent = document.getElementById('isUrgent').checked;
@@ -1593,10 +2276,16 @@
                     status,
                     cancelReason: status === 'ملغي' ? cancelReason : '',
                     notes,
-                    lastUpdated: nowIso
+                    lastUpdated: nowIso,
+                    createdBy: oldProj.createdBy || (currentUser ? currentUser.displayName : 'م. أمير'),
+                    creatorRole: oldProj.creatorRole || (currentUser ? currentUser.role : 'Admin'),
+                    createdByUsername: oldProj.createdByUsername || (currentUser ? currentUser.username : 'admin')
                 };
 
                 showToast(`تم تحديث بيانات المشروع ${quotationCode} بنجاح`, 'success');
+                
+                const statusChangedNote = oldProj.status !== status ? ` (وتغيير الحالة من "${oldProj.status}" إلى "${status}")` : '';
+                await logActivity('تعديل', `تعديل بيانات المشروع (${quotationCode} - ${projectName})${statusChangedNote}`);
             } else {
                 let initialAmount = baseAmountVal !== '' ? parseFloat(baseAmountVal) : 0;
                 let priceHistory = [];
@@ -1632,11 +2321,15 @@
                     cancelReason: status === 'ملغي' ? cancelReason : '',
                     notes,
                     createdAt: nowIso,
-                    lastUpdated: nowIso
+                    lastUpdated: nowIso,
+                    createdBy: currentUser ? currentUser.displayName : 'م. أمير',
+                    creatorRole: currentUser ? currentUser.role : 'Admin',
+                    createdByUsername: currentUser ? currentUser.username : 'admin'
                 };
 
                 projects.unshift(newProject);
                 showToast(`تم حفظ المشروع الجديد ${quotationCode}`, 'success');
+                await logActivity('إضافة', `إضافة مشروع جديد (${quotationCode} - ${projectName}) في منطقة ${location} بحالة "${status}"`);
             }
 
             saveAllToStorage();
@@ -1651,17 +2344,25 @@
         function askDeleteProject(projectId) {
             const p = projects.find(item => item.id === projectId);
             if (!p) return;
+            if (!canFullEditProject(p)) {
+                showToast('عذراً، لا تملك صلاحية حذف المشاريع المسجلة بواسطة الإدارة', 'error');
+                return;
+            }
             deleteTargetId = projectId;
             document.getElementById('confirmDeleteText').textContent = `هل أنت متأكد من رغبتك في حذف المشروع "${p.projectName}" (${p.quotationCode}) نهائياً؟`;
             document.getElementById('confirmDeleteModal').classList.remove('hidden');
             
-            document.getElementById('confirmDeleteBtn').onclick = function() {
+            document.getElementById('confirmDeleteBtn').onclick = async function() {
+                const deletedProj = projects.find(item => item.id === deleteTargetId);
                 projects = projects.filter(item => item.id !== deleteTargetId);
                 saveAllToStorage();
                 renderStatusFilterTabs();
                 renderProjects();
                 closeConfirmDelete();
                 showToast('تم حذف المشروع بنجاح', 'warning');
+                if (deletedProj) {
+                    await logActivity('حذف', `حذف المشروع (${deletedProj.quotationCode} - ${deletedProj.projectName})`);
+                }
             };
         }
 
@@ -1839,7 +2540,7 @@
                 }
 
                 if (search) {
-                    const haystack = [p.quotationCode, p.projectName, p.location, p.locationDetails, ...(p.workTypes || []), ...(p.managers || []), ...(p.contacts || []).map(c => `${c.name} ${c.phone}`), p.email, p.status].join(' ').toLowerCase();
+                    const haystack = [p.quotationCode, p.projectName, p.location, p.locationDetails, p.createdBy, ...(p.workTypes || []), ...(p.managers || []), ...(p.contacts || []).map(c => `${c.name} ${c.phone}`), p.email, p.status].join(' ').toLowerCase();
                     if (!haystack.includes(search)) return false;
                 }
 
@@ -1889,6 +2590,9 @@
                 const prevPrice = hasRevisions ? p.priceHistory[p.priceHistory.length - 2].amount : null;
                 const isActiveSuperUrgent = p.isUrgent && p.status !== 'مرسي' && p.status !== 'ملغي';
                 const cardHighlightClass = isActiveSuperUrgent ? 'highlight-super-urgent border-rose-500' : st.cardClass;
+                
+                const hasFullAccess = canFullEditProject(p);
+                const creatorNameDisplay = p.createdBy || 'م. أمير';
 
                 return `
                 <article class="rounded-2xl bg-white dark:bg-slate-900 border ${cardHighlightClass} p-5 shadow-sm hover:shadow-xl transition-all flex flex-col justify-between gap-4">
@@ -1897,13 +2601,14 @@
                             <div class="flex items-center gap-1.5 flex-wrap">
                                 <span class="inline-block px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-sky-600 dark:text-sky-400 font-extrabold text-xs num-en border border-slate-200 dark:border-slate-700">${p.quotationCode}</span>
                                 ${p.isUrgent ? `<span class="px-2.5 py-1 rounded-lg bg-gradient-to-r from-rose-600 to-orange-600 text-white text-[11px] font-black shadow-md shadow-rose-500/30 flex items-center gap-1 ${isActiveSuperUrgent ? 'super-badge-pulse' : ''}"><i class="fa-solid fa-fire-flame-curved"></i> مستعجل</span>` : ''}
+                                ${!hasFullAccess ? `<span class="px-2 py-0.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-bold border border-slate-300 dark:border-slate-700 flex items-center gap-1" title="مشروع للإدارة - متاح تغيير الحالة فقط"><i class="fa-solid fa-lock text-amber-500"></i> مقفل للتفاصيل</span>` : ''}
                                 ${!p.isUrgent && st.alertMsg ? `<span class="text-[11px] font-extrabold ${p.status === 'جديد' ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400'}"><i class="fa-solid fa-bell animate-bounce ml-0.5"></i> ${st.alertMsg}</span>` : ''}
                             </div>
                             <span class="px-3 py-1 rounded-full text-xs font-extrabold border flex items-center gap-1.5 shrink-0 ${st.badgeClass}"><i class="fa-solid ${st.icon}"></i><span>${p.status}</span></span>
                         </div>
 
                         <div>
-                            <h3 onclick="openDetailsModal('${p.id}')" class="text-base font-extrabold text-slate-800 dark:text-white hover:text-sky-500 cursor-pointer transition line-clamp-2">${p.projectName}</h3>
+                            <h3 ${hasFullAccess ? `onclick="openDetailsModal('${p.id}')"` : ''} class="text-base font-extrabold text-slate-800 dark:text-white ${hasFullAccess ? 'hover:text-sky-500 cursor-pointer' : 'cursor-default'} transition line-clamp-2">${p.projectName}</h3>
                             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5">
                                 <i class="fa-solid fa-location-dot text-rose-500"></i>
                                 <span class="font-semibold text-slate-700 dark:text-slate-300">${p.location || 'غير محدد'}</span>
@@ -1914,7 +2619,7 @@
                         <!-- عرض البنود مع أسعارها إذا كان التسعير المنفصل مفعلاً -->
                         <div class="flex flex-wrap gap-1.5">
                             ${(p.workTypes && p.workTypes.length > 0) ? p.workTypes.map(w => {
-                                const itemPrice = (p.isItemized && p.itemPrices && p.itemPrices[w] > 0) ? formatKWD(p.itemPrices[w]) : null;
+                                const itemPrice = (hasFullAccess && p.isItemized && p.itemPrices && p.itemPrices[w] > 0) ? formatKWD(p.itemPrices[w]) : null;
                                 return `
                                     <span class="px-2.5 py-1 rounded-md bg-sky-500/10 text-sky-700 dark:text-sky-300 text-[11px] font-bold border border-sky-500/20 inline-flex items-center gap-1.5">
                                         <span>${w}</span>
@@ -1934,15 +2639,20 @@
                                 <span class="text-slate-500 dark:text-slate-400"><i class="fa-solid fa-calendar-days text-indigo-400 ml-1"></i> تاريخ الاستلام:</span>
                                 <span class="num-en text-[11px] font-semibold text-slate-600 dark:text-slate-300">${p.assignedDate} <span class="text-indigo-500 dark:text-indigo-400 font-sans font-bold mr-1">(${getRelativeDaysArabic(p.assignedDate)})</span></span>
                             </div>` : ''}
+                            <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
+                                <span class="text-slate-500 dark:text-slate-400"><i class="fa-solid fa-user-pen text-emerald-500 ml-1"></i> بواسطة:</span>
+                                <span class="font-bold text-emerald-700 dark:text-emerald-400">${creatorNameDisplay}</span>
+                            </div>
                         </div>
 
-                        ${(p.contacts && p.contacts.length > 0) ? `
+                        ${hasFullAccess && (p.contacts && p.contacts.length > 0) ? `
                         <div class="flex flex-wrap gap-1.5">
                             ${p.contacts.map(c => `<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20 text-[11px] font-semibold"><i class="fa-solid fa-phone text-[10px]"></i><span>${c.name || 'تواصل'}:</span>${c.phone ? `<a href="tel:${c.phone}" class="num-en font-bold underline hover:text-teal-500">${c.phone}</a>` : ''}</div>`).join('')}
                         </div>` : ''}
 
                         ${p.status === 'ملغي' && p.cancelReason ? `<div class="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-xs text-rose-700 dark:text-rose-300"><strong><i class="fa-solid fa-circle-info ml-1"></i> سبب الإلغاء:</strong> ${p.cancelReason}</div>` : ''}
 
+                        ${hasFullAccess ? `
                         <div class="p-3 rounded-xl bg-gradient-to-l from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-800/50 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
                             <div>
                                 <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">
@@ -1956,14 +2666,29 @@
                             </div>
                             ${p.submissionDate ? `<div class="text-left"><span class="text-[10px] text-slate-400 block">تاريخ التقديم</span><span class="text-xs font-bold num-en text-slate-600 dark:text-slate-300">${p.submissionDate}</span></div>` : ''}
                         </div>
+                        ` : `
+                        <div class="p-3 rounded-xl bg-slate-100/80 dark:bg-slate-800/40 border border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-amber-500"></i> التفاصيل والأسعار محمية</span>
+                            <button onclick="openQuickStatusModal('${p.id}')" class="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-bold text-[11px] transition cursor-pointer">
+                                تغيير الحالة
+                            </button>
+                        </div>
+                        `}
                     </div>
 
                     <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2">
                         <div class="text-[11px] text-slate-400"><span>آخر تحديث:</span> <span class="num-en font-semibold block sm:inline">${p.lastUpdated || ''}</span></div>
                         <div class="flex items-center gap-1.5">
-                            <button onclick="openDetailsModal('${p.id}')" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center transition cursor-pointer" title="عرض التفاصيل"><i class="fa-solid fa-eye text-xs"></i></button>
-                            <button onclick="openProjectModal('${p.id}')" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-amber-500 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center transition cursor-pointer" title="تعديل"><i class="fa-solid fa-pen text-xs"></i></button>
-                            <button onclick="askDeleteProject('${p.id}')" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-red-600 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center transition cursor-pointer" title="حذف"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                            ${hasFullAccess ? `
+                                <button onclick="openDetailsModal('${p.id}')" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center transition cursor-pointer" title="عرض التفاصيل"><i class="fa-solid fa-eye text-xs"></i></button>
+                                <button onclick="openProjectModal('${p.id}')" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-amber-500 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center transition cursor-pointer" title="تعديل"><i class="fa-solid fa-pen text-xs"></i></button>
+                                <button onclick="askDeleteProject('${p.id}')" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-red-600 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center transition cursor-pointer" title="حذف"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                            ` : `
+                                <button onclick="openQuickStatusModal('${p.id}')" class="px-3 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500 text-amber-700 dark:text-amber-300 hover:text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer" title="تغيير حالة المشروع فقط">
+                                    <i class="fa-solid fa-arrows-rotate text-xs"></i>
+                                    <span>تحديث الحالة</span>
+                                </button>
+                            `}
                         </div>
                     </div>
                 </article>`;
@@ -1982,6 +2707,8 @@
                             ? 'bg-amber-500/10 dark:bg-amber-950/25 border-r-4 border-r-amber-500' 
                             : 'hover:bg-slate-50 dark:hover:bg-slate-800/40';
                 const hasRevisions = p.priceHistory && p.priceHistory.length > 1;
+                const hasFullAccess = canFullEditProject(p);
+                const creatorNameDisplay = p.createdBy || 'م. أمير';
 
                 return `
                 <tr class="${rowHighlight} transition">
@@ -1990,13 +2717,13 @@
                         ${p.isUrgent ? `<span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded bg-rose-600 text-white text-[10px] font-black"><i class="fa-solid fa-fire-flame-curved"></i> مستعجل</span>` : ''}
                     </td>
                     <td class="py-3.5 px-4 max-w-xs">
-                        <div onclick="openDetailsModal('${p.id}')" class="font-bold text-slate-800 dark:text-white hover:text-sky-500 cursor-pointer">${p.projectName}</div>
+                        <div ${hasFullAccess ? `onclick="openDetailsModal('${p.id}')"` : ''} class="font-bold text-slate-800 dark:text-white ${hasFullAccess ? 'hover:text-sky-500 cursor-pointer' : ''}">${p.projectName}</div>
                         <div class="text-xs text-slate-500 mt-0.5"><i class="fa-solid fa-location-dot text-rose-500 ml-1"></i>${p.location || '-'}</div>
                     </td>
                     <td class="py-3.5 px-4">
                         <div class="flex flex-wrap gap-1 max-w-[230px]">
                             ${(p.workTypes || []).map(w => {
-                                const itemPrice = (p.isItemized && p.itemPrices && p.itemPrices[w] > 0) ? formatKWD(p.itemPrices[w]) : null;
+                                const itemPrice = (hasFullAccess && p.isItemized && p.itemPrices && p.itemPrices[w] > 0) ? formatKWD(p.itemPrices[w]) : null;
                                 return `<span class="px-2 py-0.5 rounded bg-sky-500/10 text-sky-700 dark:text-sky-300 text-[11px] font-semibold">${w}${itemPrice ? ` (<span class="num-en font-bold">${itemPrice}</span>)` : ''}</span>`;
                             }).join('')}
                         </div>
@@ -2005,21 +2732,33 @@
                         <div class="font-bold text-slate-700 dark:text-slate-200">${(p.managers || []).join(' ، ') || '-'}</div>
                         ${p.assignedDate ? `<div class="num-en text-[11px] text-slate-400 mt-0.5">${p.assignedDate}</div>` : ''}
                     </td>
-                    <td class="py-3.5 px-4 text-xs">${(p.contacts || []).map(c => `<div>${c.name || ''}: <span class="num-en font-bold">${c.phone || ''}</span></div>`).join('') || '-'}</td>
+                    <td class="py-3.5 px-4 text-xs">${hasFullAccess ? ((p.contacts || []).map(c => `<div>${c.name || ''}: <span class="num-en font-bold">${c.phone || ''}</span></div>`).join('') || '-') : '<span class="text-slate-400"><i class="fa-solid fa-lock text-amber-500 ml-1"></i> محمي</span>'}</td>
                     <td class="py-3.5 px-4 whitespace-nowrap">
-                        <div class="font-black num-en text-slate-900 dark:text-white">${p.currentAmount > 0 ? formatKWD(p.currentAmount) : '-'}</div>
-                        ${hasRevisions ? `<div class="text-[10px] text-purple-500 font-bold">محدث (${p.priceHistory.length - 1})</div>` : ''}
+                        ${hasFullAccess ? `
+                            <div class="font-black num-en text-slate-900 dark:text-white">${p.currentAmount > 0 ? formatKWD(p.currentAmount) : '-'}</div>
+                            ${hasRevisions ? `<div class="text-[10px] text-purple-500 font-bold">محدث (${p.priceHistory.length - 1})</div>` : ''}
+                        ` : '<span class="text-xs text-slate-400"><i class="fa-solid fa-lock text-amber-500 ml-1"></i> محمي</span>'}
                     </td>
                     <td class="py-3.5 px-4 whitespace-nowrap">
                         <span class="px-2.5 py-1 rounded-full text-xs font-extrabold border inline-flex items-center gap-1.5 ${st.badgeClass}"><i class="fa-solid ${st.icon}"></i><span>${p.status}</span></span>
                         ${p.status === 'ملغي' && p.cancelReason ? `<div class="text-[11px] text-rose-500 mt-1 max-w-[160px] truncate" title="${p.cancelReason}">${p.cancelReason}</div>` : ''}
                     </td>
-                    <td class="py-3.5 px-4 whitespace-nowrap text-xs num-en text-slate-500">${p.lastUpdated || ''}</td>
+                    <td class="py-3.5 px-4 whitespace-nowrap text-xs">
+                        <div class="font-bold text-emerald-600 dark:text-emerald-400">بواسطة: ${creatorNameDisplay}</div>
+                        <div class="num-en text-[11px] text-slate-500 mt-0.5">${p.lastUpdated || ''}</div>
+                    </td>
                     <td class="py-3.5 px-4 whitespace-nowrap text-center">
                         <div class="flex items-center justify-center gap-1">
-                            <button onclick="openDetailsModal('${p.id}')" class="p-2 rounded-lg hover:bg-sky-500/15 text-sky-500 cursor-pointer" title="تفاصيل"><i class="fa-solid fa-eye"></i></button>
-                            <button onclick="openProjectModal('${p.id}')" class="p-2 rounded-lg hover:bg-amber-500/15 text-amber-500 cursor-pointer" title="تعديل"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="askDeleteProject('${p.id}')" class="p-2 rounded-lg hover:bg-red-500/15 text-red-500 cursor-pointer" title="حذف"><i class="fa-solid fa-trash-can"></i></button>
+                            ${hasFullAccess ? `
+                                <button onclick="openDetailsModal('${p.id}')" class="p-2 rounded-lg hover:bg-sky-500/15 text-sky-500 cursor-pointer" title="تفاصيل"><i class="fa-solid fa-eye"></i></button>
+                                <button onclick="openProjectModal('${p.id}')" class="p-2 rounded-lg hover:bg-amber-500/15 text-amber-500 cursor-pointer" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="askDeleteProject('${p.id}')" class="p-2 rounded-lg hover:bg-red-500/15 text-red-500 cursor-pointer" title="حذف"><i class="fa-solid fa-trash-can"></i></button>
+                            ` : `
+                                <button onclick="openQuickStatusModal('${p.id}')" class="px-2.5 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500 text-amber-700 dark:text-amber-300 hover:text-white text-[11px] font-bold flex items-center gap-1 cursor-pointer" title="تغيير الحالة فقط">
+                                    <i class="fa-solid fa-arrows-rotate"></i>
+                                    <span>الحالة</span>
+                                </button>
+                            `}
                         </div>
                     </td>
                 </tr>`;
@@ -2030,8 +2769,14 @@
             const p = projects.find(item => item.id === projectId);
             if (!p) return;
 
+            if (!canFullEditProject(p)) {
+                showToast('عذراً، لا تملك صلاحية عرض التفاصيل الداخلية لهذا المشروع', 'error');
+                return;
+            }
+
             const st = STATUS_CONFIG[p.status] || STATUS_CONFIG['جديد'];
             const printArea = document.getElementById('printArea');
+            const creatorNameDisplay = p.createdBy || 'م. أمير';
 
             printArea.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b-2 border-sky-600">
@@ -2124,7 +2869,8 @@
 
                 ${p.notes ? `<div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 text-xs"><strong class="block mb-1 text-slate-500">ملاحظات إضافية:</strong><p class="text-slate-700 dark:text-slate-300 leading-relaxed">${p.notes}</p></div>` : ''}
 
-                <div class="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-800">
+                <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-800">
+                    <span>تم التسجيل بواسطة: <strong class="text-emerald-600 dark:text-emerald-400">${creatorNameDisplay}</strong></span>
                     <span>تاريخ الإنشاء: <span class="num-en">${p.createdAt || ''}</span></span>
                     <span>آخر تحديث: <span class="num-en">${p.lastUpdated || ''}</span></span>
                 </div>`;
@@ -2140,17 +2886,113 @@
             document.getElementById('detailsModal').classList.add('hidden');
         }
 
-        // نافذة طباعة كل المشاريع
-        function openAllProjectsPrintModal() {
-            const filtered = getFilteredProjects();
-            const printArea = document.getElementById('allProjectsPrintArea');
+        // ============================================================
+        // نافذة طباعة / تصدير PDF مع خيارات التصفية (الكل / مستعجل / إلخ)
+        // ============================================================
+        const PRINT_FILTER_OPTIONS = [
+            { key: 'ALL', label: 'الكل (جميع المشاريع)', reportTitle: 'تقرير شامل لجميع المشاريع وعروض الأسعار', icon: 'fa-layer-group' },
+            { key: 'SUPER_URGENT', label: 'مستعجل جداً 🔥', reportTitle: 'تقرير المشاريع المستعجلة جداً (أولوية قصوى)', icon: 'fa-fire-flame-curved' },
+            { key: 'URGENT', label: 'مطلوب تسعيره', reportTitle: 'تقرير المشاريع المطلوب تسعيرها (جديد + قيد التسعير)', icon: 'fa-bolt' },
+            { key: 'جديد', label: 'جديد', reportTitle: 'تقرير المشاريع الجديدة (لم تُسعّر بعد)', icon: 'fa-fire' },
+            { key: 'قيد التسعير', label: 'قيد التسعير', reportTitle: 'تقرير المشاريع قيد التسعير', icon: 'fa-calculator' },
+            { key: 'تم تقديم العرض', label: 'تم تقديم العرض', reportTitle: 'تقرير عروض الأسعار المقدمة', icon: 'fa-paper-plane' },
+            { key: 'تحديث عرض السعر', label: 'تحديث عرض السعر', reportTitle: 'تقرير عروض الأسعار المحدثة', icon: 'fa-code-branch' },
+            { key: 'مرسي', label: 'مرسي', reportTitle: 'تقرير المشاريع المرسية', icon: 'fa-trophy' },
+            { key: 'ملغي', label: 'ملغي', reportTitle: 'تقرير المشاريع الملغاة', icon: 'fa-ban' }
+        ];
 
-            if (filtered.length === 0) {
+        function getProjectsForPrintFilter(filterKey) {
+            const priorityOrder = { 'جديد': 1, 'قيد التسعير': 2, 'تحديث عرض السعر': 3, 'تم تقديم العرض': 4, 'مرسي': 5, 'ملغي': 6 };
+            
+            const filtered = projects.filter(p => {
+                // إذا كان المستخدم محدود الصلاحية، يعرض في الطباعة فقط المشاريع التي يملك صلاحيتها أو التي أنشأها
+                if (!isAdminUser() && !canFullEditProject(p)) return false;
+
+                if (filterKey === 'SUPER_URGENT') {
+                    return p.isUrgent && p.status !== 'مرسي' && p.status !== 'ملغي';
+                } else if (filterKey === 'URGENT') {
+                    return p.status === 'جديد' || p.status === 'قيد التسعير';
+                } else if (filterKey !== 'ALL') {
+                    return p.status === filterKey;
+                }
+                return true;
+            });
+
+            return [...filtered].sort((a, b) => {
+                const aActiveUrgent = a.isUrgent && a.status !== 'مرسي' && a.status !== 'ملغي';
+                const bActiveUrgent = b.isUrgent && b.status !== 'مرسي' && b.status !== 'ملغي';
+                if (aActiveUrgent !== bActiveUrgent) return aActiveUrgent ? -1 : 1;
+
+                const pa = priorityOrder[a.status] || 99;
+                const pb = priorityOrder[b.status] || 99;
+                if (pa !== pb) return pa - pb;
+                return new Date(b.lastUpdated) - new Date(a.lastUpdated);
+            });
+        }
+
+        function setPrintFilter(filterKey) {
+            currentPrintFilter = filterKey;
+            renderPrintFilterButtons();
+            renderAllProjectsPrintContent();
+        }
+
+        function renderPrintFilterButtons() {
+            const container = document.getElementById('printFilterButtonsContainer');
+            if (!container) return;
+
+            container.innerHTML = PRINT_FILTER_OPTIONS.map(opt => {
+                const count = getProjectsForPrintFilter(opt.key).length;
+                const active = currentPrintFilter === opt.key;
+                return `
+                    <button type="button" onclick="setPrintFilter('${opt.key}')" class="shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition cursor-pointer border ${
+                        active 
+                        ? 'bg-sky-600 text-white border-sky-600 shadow-sm' 
+                        : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:border-sky-500'
+                    }">
+                        <i class="fa-solid ${opt.icon} ${opt.key === 'SUPER_URGENT' && !active ? 'text-rose-500' : ''}"></i>
+                        <span>${opt.label}</span>
+                        <span class="px-1.5 py-0.2 rounded text-[11px] num-en ${active ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'}">${count}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function openAllProjectsPrintModal() {
+            if (projects.length === 0) {
                 showToast('لا توجد مشاريع للطباعة حالياً', 'warning');
                 return;
             }
 
-            const totalSum = filtered.filter(p => p.status !== 'ملغي').reduce((acc, p) => acc + (parseFloat(p.currentAmount) || 0), 0);
+            // البدء بنفس الفلتر النشط في الصفحة الرئيسية إن وُجد، أو الكل
+            currentPrintFilter = currentFilterStatus || 'ALL';
+            renderPrintFilterButtons();
+            renderAllProjectsPrintContent();
+
+            document.getElementById('allProjectsPrintModal').classList.remove('hidden');
+        }
+
+        function renderAllProjectsPrintContent() {
+            const listToPrint = getProjectsForPrintFilter(currentPrintFilter);
+            const printArea = document.getElementById('allProjectsPrintArea');
+            const filterMeta = PRINT_FILTER_OPTIONS.find(o => o.key === currentPrintFilter) || PRINT_FILTER_OPTIONS[0];
+
+            document.getElementById('printFilterCountLabel').textContent = `عدد المشاريع المختارة: ${listToPrint.length}`;
+            document.getElementById('printActionBtnText').textContent = `طباعة / PDF (${listToPrint.length})`;
+
+            if (listToPrint.length === 0) {
+                printArea.innerHTML = `
+                    <div class="py-16 text-center text-slate-500 space-y-2">
+                        <i class="fa-solid fa-folder-open text-4xl text-slate-300"></i>
+                        <p class="font-bold text-base text-slate-700">لا توجد مشاريع ضمن تصنيف "${filterMeta.label}"</p>
+                        <p class="text-xs">اختر تصنيفاً آخر من الأزرار بالأعلى للطباعة أو التصدير كـ PDF.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const totalSum = listToPrint
+                .filter(p => currentPrintFilter === 'ملغي' ? true : p.status !== 'ملغي')
+                .reduce((acc, p) => acc + (parseFloat(p.currentAmount) || 0), 0);
 
             printArea.innerHTML = `
                 <div class="flex items-center justify-between pb-4 border-b-2 border-sky-600 mb-6">
@@ -2158,12 +3000,12 @@
                         <div class="w-12 h-12 rounded-2xl bg-sky-600 text-white flex items-center justify-center text-2xl shrink-0"><i class="fa-solid fa-compass-drafting"></i></div>
                         <div>
                             <h2 class="text-lg font-black text-slate-900">شركة الراي الهندسية لتشييد و تشطيب المباني</h2>
-                            <p class="text-xs text-slate-500">تقرير شامل لجميع المشاريع وعروض الأسعار • المهندس أمير</p>
+                            <p class="text-xs font-bold text-sky-700">${filterMeta.reportTitle} • المهندس أمير</p>
                         </div>
                     </div>
                     <div class="text-left text-xs text-slate-500">
                         <div>تاريخ التقرير: <span class="num-en font-bold">${new Date().toLocaleDateString('en-GB')}</span></div>
-                        <div>عدد المشاريع: <span class="num-en font-bold">${filtered.length}</span></div>
+                        <div>عدد المشاريع: <span class="num-en font-bold">${listToPrint.length}</span></div>
                     </div>
                 </div>
 
@@ -2180,7 +3022,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-200">
-                            ${filtered.map(p => `
+                            ${listToPrint.map(p => `
                                 <tr>
                                     <td class="p-2.5 font-extrabold num-en text-sky-700">
                                         ${p.quotationCode}
@@ -2209,15 +3051,50 @@
                 </div>
 
                 <div class="mt-6 pt-4 border-t border-slate-300 flex items-center justify-between font-bold text-sm">
-                    <span>إجمالي قيمة العروض الفعالة في التقرير:</span>
+                    <span>إجمالي قيمة العروض في هذا التقرير:</span>
                     <span class="num-en text-sky-700 text-base">${formatKWD(totalSum)} KWD</span>
                 </div>
             `;
+        }
 
-            document.getElementById('allProjectsPrintModal').classList.remove('hidden');
+        function sharePrintReportSummary() {
+            const listToPrint = getProjectsForPrintFilter(currentPrintFilter);
+            if (listToPrint.length === 0) {
+                showToast('لا توجد مشاريع في هذه الفئة للمشاركة', 'warning');
+                return;
+            }
+            const filterMeta = PRINT_FILTER_OPTIONS.find(o => o.key === currentPrintFilter) || PRINT_FILTER_OPTIONS[0];
+            const lines = [
+                `*شركة الراي الهندسية لتشييد و تشطيب المباني*`,
+                `📋 *${filterMeta.reportTitle}* (${listToPrint.length} مشروع)`,
+                `📅 التاريخ: ${new Date().toLocaleDateString('en-GB')}`,
+                `━━━━━━━━━━━━━━`
+            ];
+            listToPrint.forEach((p, idx) => {
+                const urgentTag = p.isUrgent ? ' 🔥[مستعجل]' : '';
+                const amountTag = p.currentAmount > 0 ? ` | 💰 ${formatKWD(p.currentAmount)} KWD` : '';
+                lines.push(`${idx + 1}. *${p.quotationCode}*${urgentTag} - ${p.projectName} (${p.location || '-'}) | الحالة: ${p.status}${amountTag}`);
+            });
+
+            const textSummary = lines.join('\n');
+            if (navigator.share) {
+                navigator.share({
+                    title: filterMeta.reportTitle,
+                    text: textSummary
+                }).catch(() => {});
+            } else if (navigator.clipboard) {
+                navigator.clipboard.writeText(textSummary).then(() => {
+                    showToast('تم نسخ ملخص التقرير للحافظة وجاهز للإرسال (واتساب / إيميل)', 'success');
+                });
+            }
         }
 
         function printAllProjectsAction() {
+            const listToPrint = getProjectsForPrintFilter(currentPrintFilter);
+            if (listToPrint.length === 0) {
+                showToast('لا توجد مشاريع في هذه الفئة للطباعة', 'warning');
+                return;
+            }
             window.print();
         }
 
@@ -2226,6 +3103,10 @@
         }
 
         function openSettingsModal() {
+            if (!isAdminUser()) {
+                showToast('عذراً، إدارة القوائم متاحة للمدير العام فقط', 'error');
+                return;
+            }
             renderSettingsLists();
             document.getElementById('settingsModal').classList.remove('hidden');
         }
@@ -2316,13 +3197,14 @@
         }
 
         function exportToCSV() {
-            if (projects.length === 0) {
-                showToast('لا توجد مشاريع لتصديرها حالياً', 'warning');
+            const allowedProjects = projects.filter(p => isAdminUser() || canFullEditProject(p));
+            if (allowedProjects.length === 0) {
+                showToast('لا توجد مشاريع متاحة لتصديرها حالياً', 'warning');
                 return;
             }
 
-            const headers = ['كود المشروع', 'الأولوية', 'اسم المشروع', 'الموقع', 'تفاصيل الموقع', 'نوع الأعمال وتفصيل الأسعار', 'المسؤول عن المشروع', 'تاريخ الاستلام', 'جهات التواصل والأرقام', 'البريد الإلكتروني', 'تاريخ تقديم العرض', 'قيمة العرض الإجمالية (KWD)', 'وضع المشروع', 'سبب الإلغاء', 'عدد تحديثات السعر', 'آخر تحديث'];
-            const rows = projects.map(p => [
+            const headers = ['كود المشروع', 'الأولوية', 'اسم المشروع', 'الموقع', 'تفاصيل الموقع', 'نوع الأعمال وتفصيل الأسعار', 'المسؤول عن المشروع', 'تاريخ الاستلام', 'جهات التواصل والأرقام', 'البريد الإلكتروني', 'تاريخ تقديم العرض', 'قيمة العرض الإجمالية (KWD)', 'وضع المشروع', 'سبب الإلغاء', 'عدد تحديثات السعر', 'بواسطة', 'آخر تحديث'];
+            const rows = allowedProjects.map(p => [
                 p.quotationCode,
                 p.isUrgent ? 'مستعجل' : 'عادي',
                 p.projectName,
@@ -2338,6 +3220,7 @@
                 p.status,
                 p.cancelReason || '',
                 p.priceHistory ? Math.max(0, p.priceHistory.length - 1) : 0,
+                p.createdBy || 'م. أمير',
                 p.lastUpdated || ''
             ]);
 
@@ -2358,7 +3241,8 @@
         }
 
         function exportJSONBackup() {
-            const backupData = { company: "شركة الراي الهندسية لتشييد و تشطيب المباني", exportedAt: new Date().toISOString(), projects, kuwaitAreas, workTypes, savedManagers };
+            const allowedProjects = projects.filter(p => isAdminUser() || canFullEditProject(p));
+            const backupData = { company: "شركة الراي الهندسية لتشييد و تشطيب المباني", exportedAt: new Date().toISOString(), projects: allowedProjects, kuwaitAreas, workTypes, savedManagers };
             const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -2370,10 +3254,15 @@
         }
 
         function importJSONBackup(event) {
+            if (!isAdminUser()) {
+                showToast('استعادة النسخ الاحتياطية متاح للمدير العام فقط', 'error');
+                event.target.value = '';
+                return;
+            }
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 try {
                     const data = JSON.parse(e.target.result);
                     if (Array.isArray(data.projects)) {
@@ -2386,7 +3275,8 @@
                         populateManagerFilter();
                         renderStatusFilterTabs();
                         renderProjects();
-                        showToast('تمت استعادة البيانات بنجاح', 'success');
+                        showToast('تمت استعادة البيانات ومزامنتها سحابياً بنجاح', 'success');
+                        await logActivity('تعديل', `استعادة نسخة احتياطية (JSON) تحتوي على ${projects.length} مشروع`);
                     } else {
                         showToast('ملف النسخة الاحتياطية غير صالح', 'error');
                     }
