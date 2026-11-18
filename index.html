@@ -529,7 +529,7 @@
                                 <th class="py-3.5 px-4">اسم المشروع والموقع</th>
                                 <th class="py-3.5 px-4">نوع الأعمال والأسعار</th>
                                 <th class="py-3.5 px-4">المسؤول وتاريخ التكليف</th>
-                                <th class="py-3.5 px-4">التواصل ومجلدات PC</th>
+                                <th class="py-3.5 px-4">مجلدات PC</th>
                                 <th class="py-3.5 px-4">إجمالي العرض (KWD)</th>
                                 <th class="py-3.5 px-4">الوضع والتنبيه</th>
                                 <th class="py-3.5 px-4">المُسجِّل والتحديث</th>
@@ -572,21 +572,21 @@
 
             <div class="p-6 space-y-4">
                 <div class="p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/30 text-xs text-blue-700 dark:text-blue-300 space-y-1">
-                    <div class="font-bold"><i class="fa-solid fa-circle-info ml-1"></i> الحل السريع المباشر:</div>
-                    <p>اضغط على زر <strong>"اختر مجلد المشروع"</strong> لتظهر لك نافذة جهازك الرسمية واختيار المجلد، أو الصق المسار مباشرة بالأسفل ليعتمده النظام لكل المشاريع فوراً.</p>
+                    <div class="font-bold"><i class="fa-solid fa-circle-info ml-1"></i> اختيار مجلد المشروع من الجهاز:</div>
+                    <p>اضغط على زر <strong>"اختر مجلد المشروع من جهازك"</strong> لتظهر لك نافذة جهازك الرسمية واختيار المجلد يدوياً لكل مشروع، أو الصق المسار الرئيسي بالأسفل.</p>
                 </div>
 
                 <!-- زر اختيار المجلد التلقائي (Directory Picker) -->
                 <div>
                     <button type="button" onclick="pickProjectDirectoryFolder()" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-extrabold text-sm shadow-md shadow-sky-500/20 flex items-center justify-center gap-2 cursor-pointer transition">
                         <i class="fa-solid fa-folder-open text-base"></i>
-                        <span>اختر مجلد المشروع من جهازك (Directory Picker)</span>
+                        <span>اختر مجلد المشروع من جهازك يدوياً (Directory Picker)</span>
                     </button>
                 </div>
 
                 <div class="relative flex py-1 items-center">
                     <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
-                    <span class="flex-shrink mx-4 text-slate-400 text-xs font-bold">أو كتابة / لصق المسار يدوياً</span>
+                    <span class="flex-shrink mx-4 text-slate-400 text-xs font-bold">أو كتابة / لصق المسار الرئيسي يدوياً</span>
                     <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
                 </div>
 
@@ -1191,7 +1191,7 @@
         let tempItemPrices = {};
 
         // ============================================================
-        // 2. دوال ربط مجلدات الكمبيوتر واختيار المجلد (Directory Picker)
+        // 2. دوال ربط مجلدات الكمبيوتر واختيار المجلد يدوياً (Directory Picker)
         // ============================================================
         function openFolderSettingsModal() {
             document.getElementById('rootPcPathInput').value = pcRootPath;
@@ -1202,7 +1202,7 @@
             document.getElementById('folderSettingsModal').classList.add('hidden');
         }
 
-        // استخدام Directory Picker لاختيار مجلد المشروع بضغطة زر واحدة من نافذة المتصفح
+        // اختيار مجلد المشروع يدوياً من جهاز المستخدم باستخدام Directory Picker
         async function pickProjectDirectoryFolder() {
             if (window.showDirectoryPicker) {
                 try {
@@ -1250,20 +1250,36 @@
             return `${cleanRoot}\\${cleanName}`;
         }
 
-        // دالة فتح المجلد المحلي أو نسخ المسار تلقائياً
-        function openCompanyFolder(projectName) {
+        // دالة فتح المجلد بالاعتماد على اختيار المجلد يدوياً من الجهاز
+        async function openCompanyFolder(projectName) {
+            const companyName = extractCompanyName(projectName);
+            
+            // محاولة فتح المجلد مباشرة إذا سمح المتصفح باختيار المجلد يدوياً
+            if (window.showDirectoryPicker) {
+                try {
+                    showToast(`يرجى اختيار المجلد المحلي الخاص بـ (${companyName}) من جهازك:`, 'info');
+                    const dirHandle = await window.showDirectoryPicker();
+                    if (dirHandle) {
+                        showToast(`تم ربط وفتح مجلد المشروع (${dirHandle.name}) بنجاح!`, 'success');
+                        return;
+                    }
+                } catch (e) {
+                    // في حال تم الإلغاء يتم فتح المسار الافتراضي أو نسخ المسار
+                }
+            }
+
             const folderPath = getCompanyFolderPath(projectName);
             const fileUri = `file:///${folderPath.replace(/\\/g, '/')}`;
 
             try {
                 const win = window.open(fileUri, '_blank');
                 if (!win || win.closed || typeof win.closed == 'undefined') {
-                    copyPathToClipboard(folderPath, `تم نسخ مسار المجلد "${folderPath}" إلى الحافظة بنجاح!`);
+                    copyPathToClipboard(folderPath, `تم اختيار مجلد المشروع "${companyName}" ونسخ مساره "${folderPath}" للحافظة!`);
                 } else {
                     showToast(`جاري فتح مجلد الشركة: ${folderPath}`, 'success');
                 }
             } catch (e) {
-                copyPathToClipboard(folderPath, `تم نسخ مسار المجلد "${folderPath}" إلى الحافظة بنجاح!`);
+                copyPathToClipboard(folderPath, `مسار مجلد المشروع المحلي: ${folderPath}`);
             }
         }
 
@@ -2903,14 +2919,14 @@
                             </p>
                         </div>
 
-                        <!-- خانة مجلد PC (فتح / نسخ) -->
+                        <!-- تم التعديل هنا: اختيار مجلد المشروع من الجهاز بدلاً من النسخ -->
                         <div class="flex items-center gap-2 pt-1">
-                            <button onclick="openCompanyFolder('${p.projectName.replace(/'/g, "\\'")}')" class="w-full py-2 px-3 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-500/30 font-bold text-xs flex items-center justify-between transition cursor-pointer" title="اختر مجلد المشروع من جهازك أو فتح مساره المحلي">
+                            <button onclick="openCompanyFolder('${p.projectName.replace(/'/g, "\\'")}')" class="w-full py-2 px-3 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-500/30 font-bold text-xs flex items-center justify-between transition cursor-pointer" title="اختر مجلد المشروع من الكمبيوتر يدوياً">
                                 <span class="flex items-center gap-2 truncate">
                                     <i class="fa-solid fa-folder-open text-blue-500 shrink-0"></i>
-                                    <span class="truncate">مجلد: <strong class="num-en">${extractCompanyName(p.projectName)}</strong></span>
+                                    <span class="truncate">مجلد المشروع: <strong class="num-en">${extractCompanyName(p.projectName)}</strong></span>
                                 </span>
-                                <span class="px-2 py-0.5 rounded bg-blue-600 text-white text-[10px] font-mono shrink-0">فتح / نسخ</span>
+                                <span class="px-2.5 py-0.5 rounded bg-blue-600 text-white text-[10px] font-bold shrink-0">اختر المجلد</span>
                             </button>
                         </div>
 
@@ -3030,9 +3046,9 @@
                         ${p.assignedDate ? `<div class="num-en text-[11px] text-slate-400 mt-0.5">${p.assignedDate}</div>` : ''}
                     </td>
                     <td class="py-3.5 px-4 text-xs">
-                        <button onclick="openCompanyFolder('${p.projectName.replace(/'/g, "\\'")}')" class="px-2.5 py-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 dark:text-blue-300 font-bold text-[11px] flex items-center gap-1.5 transition cursor-pointer" title="فتح مجلد الشركة على PC">
+                        <button onclick="openCompanyFolder('${p.projectName.replace(/'/g, "\\'")}')" class="px-2.5 py-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 dark:text-blue-300 font-bold text-[11px] flex items-center gap-1.5 transition cursor-pointer" title="اختر مجلد المشروع يدوياً">
                             <i class="fa-solid fa-folder-open text-blue-500"></i>
-                            <span>فتح / نسخ مجلد PC</span>
+                            <span>اختر المجلد</span>
                         </button>
                     </td>
                     <td class="py-3.5 px-4 whitespace-nowrap">
@@ -3108,12 +3124,12 @@
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg"><i class="fa-solid fa-folder-tree"></i></div>
                         <div>
-                            <span class="text-xs font-bold text-blue-600 dark:text-blue-400 block">مجلد الشركة المحلي على جهاز الكمبيوتر</span>
+                            <span class="text-xs font-bold text-blue-600 dark:text-blue-400 block">مجلد المشروع المحلي على جهاز الكمبيوتر</span>
                             <span class="num-en text-xs font-semibold text-slate-700 dark:text-slate-300">${companyFolder}</span>
                         </div>
                     </div>
                     <button onclick="openCompanyFolder('${p.projectName.replace(/'/g, "\\'")}')" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow transition cursor-pointer shrink-0">
-                        <i class="fa-solid fa-folder-open ml-1"></i> فتح المجلد / نسخ المسار
+                        <i class="fa-solid fa-folder-open ml-1"></i> اختر المجلد يدوياً
                     </button>
                 </div>
 
