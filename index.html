@@ -314,6 +314,12 @@
 
                 <!-- أزرار التحكم السريعة -->
                 <div class="flex items-center flex-wrap gap-2">
+                    <!-- زر استيراد رسالة الواتساب الذكي -->
+                    <button onclick="openWhatsAppImportModal()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-sm shadow-lg shadow-emerald-500/25 transition-all active:scale-95 cursor-pointer" title="استيراد تفاصيل المشروع تلقائياً من رسالة الواتساب">
+                        <i class="fa-brands fa-whatsapp text-lg"></i>
+                        <span>استيراد واتساب</span>
+                    </button>
+
                     <button onclick="openProjectModal()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-sm shadow-lg shadow-sky-500/25 transition-all active:scale-95 cursor-pointer">
                         <i class="fa-solid fa-plus-circle text-base"></i>
                         <span>مشروع / عرض سعر جديد</span>
@@ -546,6 +552,44 @@
         </section>
     </main>
 
+    <!-- نافذة استيراد رسالة الواتساب الذكية -->
+    <div id="whatsappImportModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 flex items-center justify-center">
+        <div class="max-w-xl w-full bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden my-4">
+            <div class="px-6 py-4 bg-gradient-to-l from-emerald-600 to-teal-700 text-white flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <i class="fa-brands fa-whatsapp text-2xl"></i>
+                    <div>
+                        <h3 class="font-extrabold text-base">استيراد مشروع من رسالة الواتساب</h3>
+                        <p class="text-xs text-emerald-100">الصق رسالة الطلب المنسوخة هنا لتعبئة النموذج تلقائياً</p>
+                    </div>
+                </div>
+                <button onclick="closeWhatsAppImportModal()" class="w-9 h-9 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center text-white transition cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <div class="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-700 dark:text-emerald-300">
+                    <i class="fa-solid fa-circle-info ml-1"></i>
+                    سيقوم النظام بقراءة الكود المشفر سرياً أو تحليل النص تلقائياً، ودمج <strong>اسم المشروع واسم الشركة</strong> بالصيغة المطلوبة (مثال: <em>اسم المشروع (اسم الشركة)</em>) وتعبئة كافة الحقول بضغطة زر واحدة.
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5">التقط / الصق نص الرسالة المرسلة هنا:</label>
+                    <textarea id="whatsappRawTextInput" rows="8" placeholder="الصق نص رسالة الواتساب هنا..." class="w-full p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm font-semibold outline-none focus:border-emerald-500"></textarea>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeWhatsAppImportModal()" class="px-5 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs cursor-pointer">إلغاء</button>
+                    <button type="button" onclick="processWhatsAppImport()" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-lg shadow-emerald-500/25 transition cursor-pointer flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>معالجة واستيراد البيانات</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- نافذة إضافة / تعديل مشروع -->
     <div id="projectModal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-sm overflow-y-auto p-3 sm:p-6">
         <div class="max-w-4xl mx-auto bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden my-4">
@@ -583,9 +627,9 @@
 
                     <div class="md:col-span-6">
                         <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5">
-                            اسم المشروع <span class="text-red-500">*</span>
+                            اسم المشروع (ويُفضل: اسم المشروع (اسم الشركة)) <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" id="projectName" required placeholder="مثال: إنشاء وتشطيب مبنى إداري - قطعة 3" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 focus:border-sky-500 outline-none text-sm font-semibold">
+                        <input type="text" id="projectName" required placeholder="مثال: إنشاء وتشطيب مبنى إداري (شركة الخليج)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 focus:border-sky-500 outline-none text-sm font-semibold">
                     </div>
 
                     <!-- خانة الأولوية (مستعجل ولا لا) -->
@@ -1803,6 +1847,141 @@
             input.value = '';
             document.getElementById('addLocationBox').classList.add('hidden');
             showToast(`تمت إضافة منطقة "${newLoc}" وحفظها في القائمة`, 'success');
+        }
+
+        // ============================================================
+        // استيراد رسالة الواتساب وتعبئة النموذج تلقائياً بالصيغة المطلوبة
+        // ============================================================
+        function openWhatsAppImportModal() {
+            document.getElementById('whatsappRawTextInput').value = '';
+            document.getElementById('whatsappImportModal').classList.remove('hidden');
+        }
+
+        function closeWhatsAppImportModal() {
+            document.getElementById('whatsappImportModal').classList.add('hidden');
+        }
+
+        function processWhatsAppImport() {
+            const rawText = document.getElementById('whatsappRawTextInput').value.trim();
+            if (!rawText) {
+                showToast('يرجى لصق نص رسالة الواتساب أولاً!', 'error');
+                return;
+            }
+
+            let parsedData = null;
+
+            // 1. محاولة استخراج كود المشفر ALRAI_SYNC بدقة تامة
+            const syncMatch = rawText.match(/\[ALRAI_SYNC:([A-Za-z0-9+/=]+)\]/);
+            if (syncMatch && syncMatch[1]) {
+                try {
+                    const binStr = atob(syncMatch[1]);
+                    const bytes = new Uint8Array(binStr.length);
+                    for (let i = 0; i < binStr.length; i++) {
+                        bytes[i] = binStr.charCodeAt(i);
+                    }
+                    const jsonStr = new TextDecoder().decode(bytes);
+                    parsedData = JSON.parse(jsonStr);
+                } catch (e) {
+                    console.error('Decode sync token error:', e);
+                }
+            }
+
+            // 2. إذا لم يوجد كود مشفر، نقوم بالتحليل النصي الذكي المباشر للرسالة
+            if (!parsedData) {
+                parsedData = {};
+                const lines = rawText.split('\n').map(l => l.trim()).filter(Boolean);
+                
+                let projName = '';
+                let compName = '';
+                let sender = 'م. أمير';
+                let area = 'مدينة الكويت';
+                let specs = rawText;
+                let isUrg = false;
+                let contactName = '';
+                let contactPhone = '';
+
+                if (rawText.includes('مستعجل')) isUrg = true;
+
+                lines.forEach(line => {
+                    if (line.includes('اسم المشروع:')) {
+                        projName = line.replace('اسم المشروع:', '').trim();
+                    } else if (line.includes('اسم الشركة:') || line.includes('الجهة المالكة:')) {
+                        compName = line.replace(/اسم الشركة:|الجهة المالكة:/g, '').trim();
+                    } else if (line.includes('مُرسل الطلب:') || line.includes('المسؤول:')) {
+                        sender = line.replace(/مُرسل الطلب:|المسؤول:/g, '').trim();
+                    } else if (line.includes('الموقع:')) {
+                        area = line.replace('الموقع:', '').trim();
+                    }
+                });
+
+                // إذا لم يتم استخراج الاسم أو الشركة بنصوص واضحة، نحاول استنتاجها
+                if (!projName) {
+                    projName = lines.find(l => l.length > 5 && !l.includes('شركة')) || 'مشروع جديد';
+                }
+                if (!compName) {
+                    const compLine = lines.find(l => l.includes('شركة') || l.includes('مؤسسة') || l.includes('مقاولات'));
+                    compName = compLine ? compLine.replace(/.*?(شركة|مؤسسة|مقاولات)/, '$1').trim() : 'شركة الراي الهندسية';
+                }
+
+                parsedData = {
+                    pn: projName,
+                    cn: compName,
+                    ur: isUrg,
+                    sn: sender,
+                    la: area,
+                    ld: '',
+                    wt: ['أعمال متكاملة'],
+                    sp: specs,
+                    ct: [{ n: sender, p: '' }]
+                };
+            }
+
+            // فتح نافذة المشروع الجديد وتعبئتها بالبيانات المستوردة
+            openProjectModal();
+
+            // الصيغة المطلوبة بدقة: اسم المشروع (اسم الشركة)
+            const finalProjectName = parsedData.cn 
+                ? `${parsedData.pn || 'مشروع جديد'} (${parsedData.cn})`
+                : (parsedData.pn || 'مشروع جديد');
+
+            document.getElementById('projectName').value = finalProjectName;
+            document.getElementById('isUrgent').checked = Boolean(parsedData.ur);
+            updateUrgentToggleStyle();
+
+            // تحديد المنطقة
+            const matchedArea = kuwaitAreas.find(a => a.toLowerCase() === (parsedData.la || '').toLowerCase()) || kuwaitAreas[0];
+            setupLocationSearch(matchedArea);
+            document.getElementById('locationDetails').value = parsedData.ld || '';
+
+            // بنود الأعمال
+            const incomingWorks = Array.isArray(parsedData.wt) && parsedData.wt.length > 0 ? parsedData.wt : ['أعمال متكاملة'];
+            incomingWorks.forEach(w => {
+                if (!workTypes.includes(w)) workTypes.push(w);
+            });
+            saveAllToStorage();
+            renderWorkTypesCheckboxes(incomingWorks);
+            updateMultiItemPricingUI();
+
+            // المسؤول
+            const incomingSender = parsedData.sn || 'م. أمير';
+            tempSelectedManagers = [incomingSender];
+            if (!savedManagers.includes(incomingSender)) savedManagers.push(incomingSender);
+            renderSelectedManagers();
+            renderSavedManagersChips();
+
+            // جهات التواصل
+            tempContacts = Array.isArray(parsedData.ct) && parsedData.ct.length > 0
+                ? parsedData.ct.map(c => ({ name: c.n || '', phone: c.p || '' }))
+                : [{ name: incomingSender, phone: '' }];
+            renderContactRows();
+
+            // المواصفات والملاحظات
+            if (parsedData.sp) {
+                document.getElementById('projectNotes').value = parsedData.sp;
+            }
+
+            closeWhatsAppImportModal();
+            showToast('✨ تم استيراد وتعبئة بيانات المشروع بنجاح مع دمج اسم الشركة!', 'success');
         }
 
         // ============================================================
