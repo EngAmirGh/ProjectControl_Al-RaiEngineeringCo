@@ -314,6 +314,12 @@
 
                 <!-- أزرار التحكم السريعة -->
                 <div class="flex items-center flex-wrap gap-2">
+                    <!-- زر ربط مجلدات الكمبيوتر (PC Folders) -->
+                    <button onclick="openFolderSettingsModal()" class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-sm shadow-lg shadow-blue-500/25 transition-all active:scale-95 cursor-pointer" title="إعداد مسار مجلدات المشاريع على جهاز الكمبيوتر (PC)">
+                        <i class="fa-solid fa-folder-tree text-base"></i>
+                        <span>مسار مجلدات PC</span>
+                    </button>
+
                     <!-- زر استيراد رسالة الواتساب الذكي -->
                     <button onclick="openWhatsAppImportModal()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-sm shadow-lg shadow-emerald-500/25 transition-all active:scale-95 cursor-pointer" title="استيراد تفاصيل المشروع تلقائياً من رسالة الواتساب">
                         <i class="fa-brands fa-whatsapp text-lg"></i>
@@ -527,7 +533,7 @@
                                 <th class="py-3.5 px-4">اسم المشروع والموقع</th>
                                 <th class="py-3.5 px-4">نوع الأعمال والأسعار</th>
                                 <th class="py-3.5 px-4">المسؤول وتاريخ التكليف</th>
-                                <th class="py-3.5 px-4">التواصل</th>
+                                <th class="py-3.5 px-4">التواصل ومجلدات PC</th>
                                 <th class="py-3.5 px-4">إجمالي العرض (KWD)</th>
                                 <th class="py-3.5 px-4">الوضع والتنبيه</th>
                                 <th class="py-3.5 px-4">المُسجِّل والتحديث</th>
@@ -551,6 +557,44 @@
             </div>
         </section>
     </main>
+
+    <!-- نافذة إعداد مسار مجلدات الكمبيوتر (PC Folder Settings) -->
+    <div id="folderSettingsModal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 flex items-center justify-center">
+        <div class="max-w-md w-full bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden my-4">
+            <div class="px-6 py-4 bg-gradient-to-l from-blue-600 to-indigo-700 text-white flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-folder-tree text-2xl"></i>
+                    <div>
+                        <h3 class="font-extrabold text-base">إعداد مسار مجلدات المشاريع على PC</h3>
+                        <p class="text-xs text-blue-100">ربط الشركات بمجلدات جهازك المحلي</p>
+                    </div>
+                </div>
+                <button onclick="closeFolderSettingsModal()" class="w-9 h-9 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center text-white transition cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <div class="p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/30 text-xs text-blue-700 dark:text-blue-300 space-y-1">
+                    <div class="font-bold"><i class="fa-solid fa-circle-info ml-1"></i> كيفية عمل ربط المجلدات:</div>
+                    <p>عند تحديد المسار الرئيسي (مثلاً: <code class="num-en bg-blue-500/20 px-1 rounded">C:\ONGOING</code>)، سيقوم النظام تلقائياً بربط كل شركة أو عميل بمجلد يحمل اسمه داخل هذا المسار (مثال: <code class="num-en bg-blue-500/20 px-1 rounded">C:\ONGOING\اسم_الشركة</code>).</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5">المسار الرئيسي لمجلدات المشاريع على جهازك (PC Path):</label>
+                    <input type="text" id="rootPcPathInput" placeholder="مثال: C:\ONGOING أو D:\AlRai_Projects" class="w-full px-3.5 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm num-en font-bold outline-none focus:border-blue-500">
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeFolderSettingsModal()" class="px-5 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs cursor-pointer">إلغاء</button>
+                    <button type="button" onclick="saveFolderSettings()" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-lg shadow-blue-500/25 transition cursor-pointer flex items-center gap-2">
+                        <i class="fa-solid fa-check"></i>
+                        <span>حفظ المسار</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- نافذة استيراد رسالة الواتساب الذكية -->
     <div id="whatsappImportModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 flex items-center justify-center">
@@ -1127,23 +1171,112 @@
             WORK_TYPES: 'alrai_eng_work_types_v1',
             MANAGERS: 'alrai_eng_managers_v1',
             THEME: 'alrai_eng_theme_v1',
-            VIEW_MODE: 'alrai_eng_view_mode_v1'
+            VIEW_MODE: 'alrai_eng_view_mode_v1',
+            PC_ROOT_PATH: 'alrai_eng_pc_root_path_v1'
         };
 
         let projects = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROJECTS)) || [];
         let kuwaitAreas = JSON.parse(localStorage.getItem(STORAGE_KEYS.LOCATIONS)) || [...DEFAULT_KUWAIT_AREAS];
         let workTypes = JSON.parse(localStorage.getItem(STORAGE_KEYS.WORK_TYPES)) || [...DEFAULT_WORK_TYPES];
         let savedManagers = JSON.parse(localStorage.getItem(STORAGE_KEYS.MANAGERS)) || ["م. أمير"];
+        let pcRootPath = localStorage.getItem(STORAGE_KEYS.PC_ROOT_PATH) || "C:\\ONGOING";
         
         let currentFilterStatus = 'ALL';
-        let currentPrintFilter = 'ALL'; // الفلتر المحدد داخل نافذة الطباعة / PDF
+        let currentPrintFilter = 'ALL';
         let currentViewMode = localStorage.getItem(STORAGE_KEYS.VIEW_MODE) || 'cards';
         let tempSelectedManagers = [];
         let tempContacts = [];
-        let tempItemPrices = {}; // لتخزين أسعار كل بند أثناء التعديل/الإضافة
+        let tempItemPrices = {};
 
         // ============================================================
-        // 2. دوال الصلاحيات والتسجيل السحابي والمزامنة
+        // 2. دوال ربط مجلدات الكمبيوتر (PC Folders Integration)
+        // ============================================================
+        function openFolderSettingsModal() {
+            document.getElementById('rootPcPathInput').value = pcRootPath;
+            document.getElementById('folderSettingsModal').classList.remove('hidden');
+        }
+
+        function closeFolderSettingsModal() {
+            document.getElementById('folderSettingsModal').classList.add('hidden');
+        }
+
+        function saveFolderSettings() {
+            const inputVal = document.getElementById('rootPcPathInput').value.trim();
+            if (inputVal) {
+                pcRootPath = inputVal;
+                localStorage.setItem(STORAGE_KEYS.PC_ROOT_PATH, pcRootPath);
+                showToast('تم حفظ مسار مجلدات المشاريع الرئيسي بنجاح', 'success');
+            }
+            closeFolderSettingsModal();
+        }
+
+        // استخراج اسم الشركة بدقة من اسم المشروع (مثلاً: "مبنى إداري (شركة الخليج)" -> "شركة الخليج")
+        function extractCompanyName(projectName) {
+            if (!projectName) return 'مشروع_عام';
+            const match = projectName.match(/\(([^)]+)\)/);
+            if (match && match[1]) {
+                return match[1].trim();
+            }
+            // إذا لم توجد أقواس، نأخذ اسم المشروع أو الكلمة الأولى
+            return projectName.trim();
+        }
+
+        function getCompanyFolderPath(projectName) {
+            const companyName = extractCompanyName(projectName);
+            // إزالة الرموز غير المسموحة في مسارات ويندوز إن وجدت
+            const cleanName = companyName.replace(/[<>:"/\\|?*]/g, '_');
+            const cleanRoot = pcRootPath.replace(/[/\\]+$/, '');
+            return `${cleanRoot}\\${cleanName}`;
+        }
+
+        function openCompanyFolder(projectName) {
+            const folderPath = getCompanyFolderPath(projectName);
+            const fileUri = `file:///${folderPath.replace(/\\/g, '/')}`;
+
+            // محاولة فتح المجلد مباشرة عبر بروتوكول file://
+            try {
+                const win = window.open(fileUri, '_blank');
+                if (!win || win.closed || typeof win.closed == 'undefined') {
+                    // إذا منع المتصفح الفتح المباشر، نقوم بنسخ المسار للحافظة كخطة بديلة
+                    copyPathToClipboard(folderPath, `تم حظر الفتح المباشر من المتصفح. تم نسخ المسار "${folderPath}" إلى الحافظة بنجاح!`);
+                } else {
+                    showToast(`جاري فتح مجلد الشركة: ${folderPath}`, 'success');
+                }
+            } catch (e) {
+                copyPathToClipboard(folderPath, `تم نسخ مسار المجلد "${folderPath}" إلى الحافظة بنجاح!`);
+            }
+        }
+
+        function copyPathToClipboard(pathStr, successMsg) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(pathStr).then(() => {
+                    showToast(successMsg, 'success');
+                }).catch(() => {
+                    fallbackCopyText(pathStr, successMsg);
+                });
+            } else {
+                fallbackCopyText(pathStr, successMsg);
+            }
+        }
+
+        function fallbackCopyText(text, successMsg) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast(successMsg, 'success');
+            } catch (err) {
+                showToast(`مسار المجلد المحلي: ${text}`, 'info');
+            }
+            document.body.removeChild(textArea);
+        }
+
+        // ============================================================
+        // 3. دوال الصلاحيات والتسجيل السحابي والمزامنة
         // ============================================================
         function isAdminUser() {
             return currentUser && String(currentUser.role).toLowerCase() === 'admin';
@@ -1152,10 +1285,8 @@
         function canFullEditProject(p) {
             if (!currentUser || !p) return false;
             if (isAdminUser()) return true;
-            // المستخدم المحدود (Limited) يملك كامل الصلاحية فقط على المشاريع التي أنشأها هو (ليست من Admin)
             const creatorRole = String(p.creatorRole || 'Admin').toLowerCase();
             if (creatorRole === 'admin') return false;
-            // التحقق من تطابق الحساب أو الاسم
             if (p.createdByUsername && currentUser.username) {
                 return String(p.createdByUsername).toLowerCase() === String(currentUser.username).toLowerCase();
             }
@@ -1205,7 +1336,6 @@
             submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>جاري التحقق السحابي...</span>`;
 
             try {
-                // جلب المستخدمين من جدول app_users ومقارنة اسم المستخدم مع تجاهل حالة الأحرف
                 const { data: users, error } = await supabaseClient
                     .from('app_users')
                     .select('*');
@@ -1317,7 +1447,6 @@
             }
         }
 
-        // جلب حالة النظام من Supabase system_state ومزامنتها
         async function loadSystemStateFromSupabase() {
             setCloudSyncStatus('syncing', 'جاري المزامنة...');
             try {
@@ -1347,7 +1476,6 @@
                     saveLocalCacheOnly();
                     isApplyingRemoteSync = false;
                 } else {
-                    // إذا كان الجدول فارغاً أول مرة، نرفع البيانات الحالية (إن وجدت) لإنشاء السجل الأول
                     window.__systemStateRowId = 1;
                     await pushSystemStateToSupabase();
                 }
@@ -1416,7 +1544,6 @@
                 .subscribe();
         }
 
-        // تسجيل الحركات في جدول activity_logs في Supabase
         async function logActivity(actionType, details) {
             if (!currentUser) return;
             try {
@@ -1536,7 +1663,6 @@
                 }
             });
 
-            // التحقق من وجود جلسة محفوظة (Session)
             const savedSessionRaw = localStorage.getItem(SESSION_STORAGE_KEY);
             if (savedSessionRaw) {
                 try {
@@ -1551,7 +1677,6 @@
                 }
             }
 
-            // إذا لم توجد جلسة، تبقى شاشة تسجيل الدخول ظاهرة
             document.getElementById('loginScreen').classList.remove('hidden');
         };
 
@@ -1679,9 +1804,6 @@
             preview.innerHTML = `<span class="num-en">${val}</span> (${getRelativeDaysArabic(val)})`;
         }
 
-        // ==========================================
-        // تنسيق زر الأولوية (مستعجل / عادي)
-        // ==========================================
         function updateUrgentToggleStyle() {
             const isUrgent = document.getElementById('isUrgent').checked;
             const label = document.getElementById('urgentToggleLabel');
@@ -1701,9 +1823,6 @@
             }
         }
 
-        // ==========================================
-        // منطق التسعير المنفصل للبنود (اختياري)
-        // ==========================================
         function updateMultiItemPricingUI() {
             const selectedWorks = Array.from(document.querySelectorAll('input[name="workType"]:checked')).map(cb => cb.value);
             const optionBox = document.getElementById('multiItemPricingOptionBox');
@@ -1778,9 +1897,6 @@
             quoteInput.value = hasAnyValue ? sum.toFixed(3) : '';
         }
 
-        // ==========================================
-        // وظائف البحث الفوري للمناطق
-        // ==========================================
         function setupLocationSearch(selectedArea = '') {
             const searchInput = document.getElementById('locationSearchInput');
             const hiddenInput = document.getElementById('projectLocation');
@@ -1849,9 +1965,6 @@
             showToast(`تمت إضافة منطقة "${newLoc}" وحفظها في القائمة`, 'success');
         }
 
-        // ============================================================
-        // استيراد رسالة الواتساب وتعبئة النموذج تلقائياً بالصيغة المطلوبة
-        // ============================================================
         function openWhatsAppImportModal() {
             document.getElementById('whatsappRawTextInput').value = '';
             document.getElementById('whatsappImportModal').classList.remove('hidden');
@@ -1870,7 +1983,6 @@
 
             let parsedData = null;
 
-            // 1. محاولة استخراج كود المشفر ALRAI_SYNC بدقة تامة
             const syncMatch = rawText.match(/\[ALRAI_SYNC:([A-Za-z0-9+/=]+)\]/);
             if (syncMatch && syncMatch[1]) {
                 try {
@@ -1886,7 +1998,6 @@
                 }
             }
 
-            // 2. إذا لم يوجد كود مشفر، نقوم بالتحليل النصي الذكي المباشر للرسالة
             if (!parsedData) {
                 parsedData = {};
                 const lines = rawText.split('\n').map(l => l.trim()).filter(Boolean);
@@ -1897,8 +2008,6 @@
                 let area = 'مدينة الكويت';
                 let specs = rawText;
                 let isUrg = false;
-                let contactName = '';
-                let contactPhone = '';
 
                 if (rawText.includes('مستعجل')) isUrg = true;
 
@@ -1914,7 +2023,6 @@
                     }
                 });
 
-                // إذا لم يتم استخراج الاسم أو الشركة بنصوص واضحة، نحاول استنتاجها
                 if (!projName) {
                     projName = lines.find(l => l.length > 5 && !l.includes('شركة')) || 'مشروع جديد';
                 }
@@ -1936,10 +2044,8 @@
                 };
             }
 
-            // فتح نافذة المشروع الجديد وتعبئتها بالبيانات المستوردة
             openProjectModal();
 
-            // الصيغة المطلوبة بدقة: اسم المشروع (اسم الشركة)
             const finalProjectName = parsedData.cn 
                 ? `${parsedData.pn || 'مشروع جديد'} (${parsedData.cn})`
                 : (parsedData.pn || 'مشروع جديد');
@@ -1948,12 +2054,10 @@
             document.getElementById('isUrgent').checked = Boolean(parsedData.ur);
             updateUrgentToggleStyle();
 
-            // تحديد المنطقة
             const matchedArea = kuwaitAreas.find(a => a.toLowerCase() === (parsedData.la || '').toLowerCase()) || kuwaitAreas[0];
             setupLocationSearch(matchedArea);
             document.getElementById('locationDetails').value = parsedData.ld || '';
 
-            // بنود الأعمال
             const incomingWorks = Array.isArray(parsedData.wt) && parsedData.wt.length > 0 ? parsedData.wt : ['أعمال متكاملة'];
             incomingWorks.forEach(w => {
                 if (!workTypes.includes(w)) workTypes.push(w);
@@ -1962,20 +2066,17 @@
             renderWorkTypesCheckboxes(incomingWorks);
             updateMultiItemPricingUI();
 
-            // المسؤول
             const incomingSender = parsedData.sn || 'م. أمير';
             tempSelectedManagers = [incomingSender];
             if (!savedManagers.includes(incomingSender)) savedManagers.push(incomingSender);
             renderSelectedManagers();
             renderSavedManagersChips();
 
-            // جهات التواصل
             tempContacts = Array.isArray(parsedData.ct) && parsedData.ct.length > 0
                 ? parsedData.ct.map(c => ({ name: c.n || '', phone: c.p || '' }))
                 : [{ name: incomingSender, phone: '' }];
             renderContactRows();
 
-            // المواصفات والملاحظات
             if (parsedData.sp) {
                 document.getElementById('projectNotes').value = parsedData.sp;
             }
@@ -1984,9 +2085,6 @@
             showToast('✨ تم استيراد وتعبئة بيانات المشروع بنجاح مع دمج اسم الشركة!', 'success');
         }
 
-        // ============================================================
-        // نافذة التعديل السريع للحالة فقط (للمستخدم Limited على مشاريع Admin)
-        // ============================================================
         let quickStatusTargetId = null;
 
         function openQuickStatusModal(projectId) {
@@ -2054,12 +2152,10 @@
             }
         }
 
-        // إدارة نافذة إضافة / تعديل مشروع
         function openProjectModal(projectId = null) {
             if (projectId) {
                 const p = projects.find(item => item.id === projectId);
                 if (!p) return;
-                // تطبيق قاعدة الصلاحيات الصارمة: إذا كان المستخدم Limited والمشروع للـ Admin يمنع فتح نافذة التعديل وتفتح نافذة تغيير الحالة فقط
                 if (!canFullEditProject(p)) {
                     openQuickStatusModal(projectId);
                     return;
@@ -2105,7 +2201,6 @@
                 
                 renderWorkTypesCheckboxes(p.workTypes || []);
                 
-                // استرجاع أسعار البنود إن وجدت
                 if (p.isItemized && p.itemPrices) {
                     tempItemPrices = { ...p.itemPrices };
                     document.getElementById('enableItemizedPricing').checked = true;
@@ -2156,7 +2251,6 @@
             document.getElementById('projectModal').classList.add('hidden');
         }
 
-        // أنواع الأعمال
         function renderWorkTypesCheckboxes(selectedList = []) {
             const container = document.getElementById('workTypesCheckboxes');
             container.innerHTML = '';
@@ -2214,7 +2308,6 @@
             showToast(`تمت إضافة "${newType}" إلى أنواع الأعمال`, 'success');
         }
 
-        // المسؤولون
         function addManagerToProject(nameFromChip = null) {
             const input = document.getElementById('managerInput');
             const name = (nameFromChip || input.value).trim();
@@ -2268,7 +2361,6 @@
             `).join('');
         }
 
-        // جهات الاتصال
         function addContactRow() {
             tempContacts.push({ name: '', phone: '' });
             renderContactRows();
@@ -2350,7 +2442,6 @@
             }
         }
 
-        // حفظ المشروع
         async function saveProject(event) {
             event.preventDefault();
 
@@ -2378,7 +2469,6 @@
             const locationDetails = document.getElementById('locationDetails').value.trim();
             const selectedWorkTypes = Array.from(document.querySelectorAll('input[name="workType"]:checked')).map(cb => cb.value);
             
-            // حفظ بيانات التسعير المنفصل للبنود إن كان مفعلاً
             const isItemized = selectedWorkTypes.length >= 2 && document.getElementById('enableItemizedPricing').checked;
             const cleanItemPrices = {};
             if (isItemized) {
@@ -2747,7 +2837,6 @@
 
             const priorityOrder = { 'جديد': 1, 'قيد التسعير': 2, 'تحديث عرض السعر': 3, 'تم تقديم العرض': 4, 'مرسي': 5, 'ملغي': 6 };
             const sorted = [...filtered].sort((a, b) => {
-                // المشاريع المستعجلة النشطة تتصدر القائمة دائماً
                 const aActiveUrgent = a.isUrgent && a.status !== 'مرسي' && a.status !== 'ملغي';
                 const bActiveUrgent = b.isUrgent && b.status !== 'مرسي' && b.status !== 'ملغي';
                 if (aActiveUrgent !== bActiveUrgent) return aActiveUrgent ? -1 : 1;
@@ -2775,6 +2864,7 @@
                 
                 const hasFullAccess = canFullEditProject(p);
                 const creatorNameDisplay = p.createdBy || 'م. أمير';
+                const companyFolder = getCompanyFolderPath(p.projectName);
 
                 return `
                 <article class="rounded-2xl bg-white dark:bg-slate-900 border ${cardHighlightClass} p-5 shadow-sm hover:shadow-xl transition-all flex flex-col justify-between gap-4">
@@ -2784,7 +2874,6 @@
                                 <span class="inline-block px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-sky-600 dark:text-sky-400 font-extrabold text-xs num-en border border-slate-200 dark:border-slate-700">${p.quotationCode}</span>
                                 ${p.isUrgent ? `<span class="px-2.5 py-1 rounded-lg bg-gradient-to-r from-rose-600 to-orange-600 text-white text-[11px] font-black shadow-md shadow-rose-500/30 flex items-center gap-1 ${isActiveSuperUrgent ? 'super-badge-pulse' : ''}"><i class="fa-solid fa-fire-flame-curved"></i> مستعجل</span>` : ''}
                                 ${!hasFullAccess ? `<span class="px-2 py-0.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-bold border border-slate-300 dark:border-slate-700 flex items-center gap-1" title="مشروع للإدارة - متاح تغيير الحالة فقط"><i class="fa-solid fa-lock text-amber-500"></i> مقفل للتفاصيل</span>` : ''}
-                                ${!p.isUrgent && st.alertMsg ? `<span class="text-[11px] font-extrabold ${p.status === 'جديد' ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400'}"><i class="fa-solid fa-bell animate-bounce ml-0.5"></i> ${st.alertMsg}</span>` : ''}
                             </div>
                             <span class="px-3 py-1 rounded-full text-xs font-extrabold border flex items-center gap-1.5 shrink-0 ${st.badgeClass}"><i class="fa-solid ${st.icon}"></i><span>${p.status}</span></span>
                         </div>
@@ -2798,7 +2887,17 @@
                             </p>
                         </div>
 
-                        <!-- عرض البنود مع أسعارها إذا كان التسعير المنفصل مفعلاً -->
+                        <!-- زر فتح مجلد الشركة المحلي على جهاز PC -->
+                        <div class="flex items-center gap-2 pt-1">
+                            <button onclick="openCompanyFolder('${p.projectName.replace(/'/g, "\\'")}')" class="w-full py-2 px-3 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-500/30 font-bold text-xs flex items-center justify-between transition cursor-pointer" title="فتح مجلد المشروع على الكمبيوتر أو نسخ مساره">
+                                <span class="flex items-center gap-2 truncate">
+                                    <i class="fa-solid fa-folder-open text-blue-500 shrink-0"></i>
+                                    <span class="truncate">مجلد PC: <strong class="num-en">${extractCompanyName(p.projectName)}</strong></span>
+                                </span>
+                                <span class="px-2 py-0.5 rounded bg-blue-600 text-white text-[10px] font-mono shrink-0">فتح / نسخ</span>
+                            </button>
+                        </div>
+
                         <div class="flex flex-wrap gap-1.5">
                             ${(p.workTypes && p.workTypes.length > 0) ? p.workTypes.map(w => {
                                 const itemPrice = (hasFullAccess && p.isItemized && p.itemPrices && p.itemPrices[w] > 0) ? formatKWD(p.itemPrices[w]) : null;
@@ -2914,7 +3013,12 @@
                         <div class="font-bold text-slate-700 dark:text-slate-200">${(p.managers || []).join(' ، ') || '-'}</div>
                         ${p.assignedDate ? `<div class="num-en text-[11px] text-slate-400 mt-0.5">${p.assignedDate}</div>` : ''}
                     </td>
-                    <td class="py-3.5 px-4 text-xs">${hasFullAccess ? ((p.contacts || []).map(c => `<div>${c.name || ''}: <span class="num-en font-bold">${c.phone || ''}</span></div>`).join('') || '-') : '<span class="text-slate-400"><i class="fa-solid fa-lock text-amber-500 ml-1"></i> محمي</span>'}</td>
+                    <td class="py-3.5 px-4 text-xs">
+                        <button onclick="openCompanyFolder('${p.projectName.replace(/'/g, "\\'")}')" class="px-2.5 py-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 dark:text-blue-300 font-bold text-[11px] flex items-center gap-1.5 transition cursor-pointer" title="فتح مجلد الشركة على PC">
+                            <i class="fa-solid fa-folder-open text-blue-500"></i>
+                            <span>فتح مجلد PC</span>
+                        </button>
+                    </td>
                     <td class="py-3.5 px-4 whitespace-nowrap">
                         ${hasFullAccess ? `
                             <div class="font-black num-en text-slate-900 dark:text-white">${p.currentAmount > 0 ? formatKWD(p.currentAmount) : '-'}</div>
@@ -2959,6 +3063,7 @@
             const st = STATUS_CONFIG[p.status] || STATUS_CONFIG['جديد'];
             const printArea = document.getElementById('printArea');
             const creatorNameDisplay = p.createdBy || 'م. أمير';
+            const companyFolder = getCompanyFolderPath(p.projectName);
 
             printArea.innerHTML = `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b-2 border-sky-600">
@@ -2981,6 +3086,20 @@
                     <div><span class="text-xs text-slate-400 block">الوضع الحالي</span><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold border mt-1 ${st.badgeClass}"><i class="fa-solid ${st.icon}"></i> ${p.status}</span></div>
                     <div><span class="text-xs text-slate-400 block">الموقع</span><span class="text-sm font-bold text-slate-800 dark:text-slate-200">${p.location || '-'} ${p.locationDetails ? `(${p.locationDetails})` : ''}</span></div>
                     <div><span class="text-xs text-slate-400 block">تاريخ تقديم العرض</span><span class="text-sm font-bold num-en text-slate-800 dark:text-slate-200">${p.submissionDate || 'لم يُحدد بعد'}</span></div>
+                </div>
+
+                <!-- رابط مجلد الكمبيوتر داخل تفاصيل المشروع -->
+                <div class="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg"><i class="fa-solid fa-folder-tree"></i></div>
+                        <div>
+                            <span class="text-xs font-bold text-blue-600 dark:text-blue-400 block">مجلد الشركة المحلي على جهاز الكمبيوتر</span>
+                            <span class="num-en text-xs font-semibold text-slate-700 dark:text-slate-300">${companyFolder}</span>
+                        </div>
+                    </div>
+                    <button onclick="openCompanyFolder('${p.projectName.replace(/'/g, "\\'")}')" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow transition cursor-pointer shrink-0">
+                        <i class="fa-solid fa-folder-open ml-1"></i> فتح المجلد / نسخ المسار
+                    </button>
                 </div>
 
                 ${p.status === 'ملغي' && p.cancelReason ? `<div class="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-sm text-rose-700 dark:text-rose-300"><strong>سبب إلغاء المشروع:</strong> ${p.cancelReason}</div>` : ''}
@@ -3068,9 +3187,6 @@
             document.getElementById('detailsModal').classList.add('hidden');
         }
 
-        // ============================================================
-        // نافذة طباعة / تصدير PDF مع خيارات التصفية (الكل / مستعجل / إلخ)
-        // ============================================================
         const PRINT_FILTER_OPTIONS = [
             { key: 'ALL', label: 'الكل (جميع المشاريع)', reportTitle: 'تقرير شامل لجميع المشاريع وعروض الأسعار', icon: 'fa-layer-group' },
             { key: 'SUPER_URGENT', label: 'مستعجل جداً 🔥', reportTitle: 'تقرير المشاريع المستعجلة جداً (أولوية قصوى)', icon: 'fa-fire-flame-curved' },
@@ -3087,7 +3203,6 @@
             const priorityOrder = { 'جديد': 1, 'قيد التسعير': 2, 'تحديث عرض السعر': 3, 'تم تقديم العرض': 4, 'مرسي': 5, 'ملغي': 6 };
             
             const filtered = projects.filter(p => {
-                // إذا كان المستخدم محدود الصلاحية، يعرض في الطباعة فقط المشاريع التي يملك صلاحيتها أو التي أنشأها
                 if (!isAdminUser() && !canFullEditProject(p)) return false;
 
                 if (filterKey === 'SUPER_URGENT') {
@@ -3145,7 +3260,6 @@
                 return;
             }
 
-            // البدء بنفس الفلتر النشط في الصفحة الرئيسية إن وُجد، أو الكل
             currentPrintFilter = currentFilterStatus || 'ALL';
             renderPrintFilterButtons();
             renderAllProjectsPrintContent();
@@ -3424,7 +3538,7 @@
 
         function exportJSONBackup() {
             const allowedProjects = projects.filter(p => isAdminUser() || canFullEditProject(p));
-            const backupData = { company: "شركة الراي الهندسية لتشييد و تشطيب المباني", exportedAt: new Date().toISOString(), projects: allowedProjects, kuwaitAreas, workTypes, savedManagers };
+            const backupData = { company: "شركة الراي الهندسية لتشييد و تشطيب المباني", exportedAt: new Date().toISOString(), projects: allowedProjects, kuwaitAreas, workTypes, savedManagers, pcRootPath };
             const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -3452,6 +3566,10 @@
                         if (Array.isArray(data.kuwaitAreas)) kuwaitAreas = data.kuwaitAreas;
                         if (Array.isArray(data.workTypes)) workTypes = data.workTypes;
                         if (Array.isArray(data.savedManagers)) savedManagers = data.savedManagers;
+                        if (data.pcRootPath) {
+                            pcRootPath = data.pcRootPath;
+                            localStorage.setItem(STORAGE_KEYS.PC_ROOT_PATH, pcRootPath);
+                        }
                         saveAllToStorage();
                         populateYearFilter();
                         populateManagerFilter();
