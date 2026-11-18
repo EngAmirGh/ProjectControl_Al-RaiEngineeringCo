@@ -1208,7 +1208,6 @@
                 try {
                     const dirHandle = await window.showDirectoryPicker();
                     if (dirHandle && dirHandle.name) {
-                        // استخدام اسم المجلد المختار كمسار أساسي أو جذري
                         const chosenPath = dirHandle.name;
                         pcRootPath = chosenPath;
                         document.getElementById('rootPcPathInput').value = chosenPath;
