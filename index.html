@@ -203,8 +203,8 @@
         }
     </style>
     <link rel="icon" type="image/png" href="logo.png">
-  <link rel="apple-touch-icon" href="logo.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" href="logo.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
 </head>
 <body class="bg-slate-100 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-300 selection:bg-sky-500 selection:text-white">
 
@@ -252,7 +252,7 @@
                     </div>
                 </div>
 
-                <!-- خانة التعريف الشخصي لموظف المكتب (تظهر لحساب Alrai_Office أو عند طلبها لحساب Limited) -->
+                <!-- خانة التعريف الشخصي لموظف المكتب -->
                 <div id="officeStaffNameBox" class="hidden p-4 rounded-2xl bg-amber-500/10 border-2 border-amber-500/40 space-y-2 transition-all">
                     <label class="block text-xs font-extrabold text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
                         <i class="fa-solid fa-id-badge"></i>
@@ -270,7 +270,7 @@
 
                 <div class="pt-2 text-center text-[11px] text-slate-400 flex items-center justify-center gap-1.5">
                     <i class="fa-solid fa-cloud-arrow-up text-sky-500"></i>
-                    <span>مربوط سحابياً ومزامن لحظياً  </span>
+                    <span>مربوط سحابياً ومزامن لحظياً</span>
                 </div>
             </form>
         </div>
@@ -297,7 +297,6 @@
                             <span class="px-2.5 py-0.5 text-xs font-bold rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
                                 نظام إدارة التسعير والمشاريع
                             </span>
-                            <!-- مؤشر حالة المزامنة السحابية -->
                             <span id="cloudSyncBadge" class="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
                                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                                 <span id="cloudSyncText">متصل سحابياً</span>
@@ -315,12 +314,11 @@
                 <!-- أزرار التحكم السريعة -->
                 <div class="flex items-center flex-wrap gap-2">
                     <!-- زر ربط مجلدات الكمبيوتر (PC Folders) -->
-                    <button onclick="openFolderSettingsModal()" class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-sm shadow-lg shadow-blue-500/25 transition-all active:scale-95 cursor-pointer" title="إعداد مسار مجلدات المشاريع على جهاز الكمبيوتر (PC)">
+                    <button onclick="openFolderSettingsModal()" class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-sm shadow-lg shadow-blue-500/25 transition-all active:scale-95 cursor-pointer" title="اختر أو حدد مسار مجلدات المشاريع على جهاز الكمبيوتر (PC)">
                         <i class="fa-solid fa-folder-tree text-base"></i>
                         <span>مسار مجلدات PC</span>
                     </button>
 
-                    <!-- زر استيراد رسالة الواتساب الذكي -->
                     <button onclick="openWhatsAppImportModal()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-sm shadow-lg shadow-emerald-500/25 transition-all active:scale-95 cursor-pointer" title="استيراد تفاصيل المشروع تلقائياً من رسالة الواتساب">
                         <i class="fa-brands fa-whatsapp text-lg"></i>
                         <span>استيراد واتساب</span>
@@ -331,7 +329,6 @@
                         <span>مشروع / عرض سعر جديد</span>
                     </button>
 
-                    <!-- زر سجل الحركات (يظهر للمدير Admin فقط) -->
                     <button id="btnActivityLogs" onclick="openActivityLogsModal()" class="hidden flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-indigo-600/15 hover:bg-indigo-600/25 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30 font-bold text-sm transition-all cursor-pointer" title="سجل حركات النظام والموظفين">
                         <i class="fa-solid fa-clock-rotate-left text-indigo-500"></i>
                         <span class="hidden sm:inline">سجل الحركات</span>
@@ -374,7 +371,6 @@
                         <i id="themeIcon" class="fa-solid fa-sun text-lg"></i>
                     </button>
 
-                    <!-- زر تسجيل الخروج -->
                     <button onclick="logoutUser()" class="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-rose-500/15 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white border border-rose-500/30 font-bold text-sm transition-all cursor-pointer" title="تسجيل الخروج من الحساب">
                         <i class="fa-solid fa-right-from-bracket"></i>
                         <span class="hidden md:inline">تسجيل خروج</span>
@@ -558,7 +554,7 @@
         </section>
     </main>
 
-    <!-- نافذة إعداد مسار مجلدات الكمبيوتر (PC Folder Settings) -->
+    <!-- نافذة إعداد مسار مجلدات الكمبيوتر (PC Folder Settings مع Directory Picker) -->
     <div id="folderSettingsModal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 flex items-center justify-center">
         <div class="max-w-md w-full bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden my-4">
             <div class="px-6 py-4 bg-gradient-to-l from-blue-600 to-indigo-700 text-white flex items-center justify-between">
@@ -566,7 +562,7 @@
                     <i class="fa-solid fa-folder-tree text-2xl"></i>
                     <div>
                         <h3 class="font-extrabold text-base">إعداد مسار مجلدات المشاريع على PC</h3>
-                        <p class="text-xs text-blue-100">ربط الشركات بمجلدات جهازك المحلي</p>
+                        <p class="text-xs text-blue-100">ربط الشركات بمجلدات جهازك المحلي تلقائياً</p>
                     </div>
                 </div>
                 <button onclick="closeFolderSettingsModal()" class="w-9 h-9 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center text-white transition cursor-pointer">
@@ -576,8 +572,22 @@
 
             <div class="p-6 space-y-4">
                 <div class="p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/30 text-xs text-blue-700 dark:text-blue-300 space-y-1">
-                    <div class="font-bold"><i class="fa-solid fa-circle-info ml-1"></i> كيفية عمل ربط المجلدات:</div>
-                    <p>عند تحديد المسار الرئيسي (مثلاً: <code class="num-en bg-blue-500/20 px-1 rounded">C:\ONGOING</code>)، سيقوم النظام تلقائياً بربط كل شركة أو عميل بمجلد يحمل اسمه داخل هذا المسار (مثال: <code class="num-en bg-blue-500/20 px-1 rounded">C:\ONGOING\اسم_الشركة</code>).</p>
+                    <div class="font-bold"><i class="fa-solid fa-circle-info ml-1"></i> الحل السريع المباشر:</div>
+                    <p>اضغط على زر <strong>"اختر مجلد المشروع"</strong> لتظهر لك نافذة جهازك الرسمية واختيار المجلد، أو الصق المسار مباشرة بالأسفل ليعتمده النظام لكل المشاريع فوراً.</p>
+                </div>
+
+                <!-- زر اختيار المجلد التلقائي (Directory Picker) -->
+                <div>
+                    <button type="button" onclick="pickProjectDirectoryFolder()" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-extrabold text-sm shadow-md shadow-sky-500/20 flex items-center justify-center gap-2 cursor-pointer transition">
+                        <i class="fa-solid fa-folder-open text-base"></i>
+                        <span>اختر مجلد المشروع من جهازك (Directory Picker)</span>
+                    </button>
+                </div>
+
+                <div class="relative flex py-1 items-center">
+                    <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
+                    <span class="flex-shrink mx-4 text-slate-400 text-xs font-bold">أو كتابة / لصق المسار يدوياً</span>
+                    <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
                 </div>
 
                 <div>
@@ -615,7 +625,7 @@
             <div class="p-6 space-y-4">
                 <div class="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-700 dark:text-emerald-300">
                     <i class="fa-solid fa-circle-info ml-1"></i>
-                    سيقوم النظام بقراءة الكود المشفر سرياً أو تحليل النص تلقائياً، ودمج <strong>اسم المشروع واسم الشركة</strong> بالصيغة المطلوبة (مثال: <em>اسم المشروع (اسم الشركة)</em>) وتعبئة كافة الحقول بضغطة زر واحدة.
+                    سيقوم النظام بقراءة الكود المشفر سرياً أو تحليل النص تلقائياً، ودمج <strong>اسم المشروع واسم الشركة</strong> بالصيغة المطلوبة وتعبئة كافة الحقول بضغطة زر واحدة.
                 </div>
 
                 <div>
@@ -676,7 +686,6 @@
                         <input type="text" id="projectName" required placeholder="مثال: إنشاء وتشطيب مبنى إداري (شركة الخليج)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 focus:border-sky-500 outline-none text-sm font-semibold">
                     </div>
 
-                    <!-- خانة الأولوية (مستعجل ولا لا) -->
                     <div class="md:col-span-3">
                         <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5">
                             أولوية المشروع
@@ -692,7 +701,7 @@
                     </div>
                 </div>
 
-                <!-- الموقع (بحث فوري واختيار من القائمة المنسدلة الذكية) -->
+                <!-- الموقع -->
                 <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-3">
                     <div class="flex items-center justify-between">
                         <label class="text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
@@ -757,7 +766,7 @@
                         <button type="button" onclick="addNewWorkTypeFromModal()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer">إضافة وحفظ</button>
                     </div>
 
-                    <!-- قسم التسعير المنفصل للبنود (يظهر تلقائياً عند اختيار بندين أو أكثر) -->
+                    <!-- قسم التسعير المنفصل للبنود -->
                     <div id="multiItemPricingOptionBox" class="hidden pt-3 border-t border-slate-200 dark:border-slate-700 space-y-3">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-sky-500/10 border border-sky-500/30 p-3 rounded-xl">
                             <div class="flex items-center gap-2.5">
@@ -769,9 +778,7 @@
                             <span class="text-[11px] text-slate-500 dark:text-slate-400">عند التفعيل، سيتم جمع أسعار البنود تلقائياً في الإجمالي</span>
                         </div>
 
-                        <div id="itemizedPricesContainer" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-                            <!-- حقول أسعار البنود تتولد ديناميكياً -->
-                        </div>
+                        <div id="itemizedPricesContainer" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700"></div>
                     </div>
                 </div>
 
@@ -964,15 +971,12 @@
                 </div>
             </div>
 
-            <!-- شريط اختيار نوع المشاريع المراد طباعتها أو إرسالها PDF -->
             <div class="px-6 py-3.5 bg-slate-100 dark:bg-slate-800/90 border-b border-slate-200 dark:border-slate-700 no-print space-y-2">
                 <div class="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-300">
                     <span><i class="fa-solid fa-filter text-sky-500 ml-1"></i> اختر الفئة المطلوب طباعتها أو حفظها كملف PDF للإرسال:</span>
                     <span id="printFilterCountLabel" class="text-sky-600 dark:text-sky-400"></span>
                 </div>
-                <div id="printFilterButtonsContainer" class="flex items-center gap-2 overflow-x-auto pb-1">
-                    <!-- الأزرار تتولد ديناميكياً -->
-                </div>
+                <div id="printFilterButtonsContainer" class="flex items-center gap-2 overflow-x-auto pb-1"></div>
             </div>
 
             <div id="allProjectsPrintArea" class="p-6 sm:p-8 space-y-6 bg-white text-slate-900"></div>
@@ -1031,7 +1035,7 @@
         </div>
     </div>
 
-    <!-- نافذة سجل الحركات للمدير (Activity Logs Modal - Admin Only) -->
+    <!-- نافذة سجل الحركات للمدير (Activity Logs Modal) -->
     <div id="activityLogsModal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-sm overflow-y-auto p-3 sm:p-6">
         <div class="max-w-4xl mx-auto bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden my-6">
             <div class="px-6 py-4 bg-gradient-to-l from-indigo-600 to-slate-900 text-white flex items-center justify-between">
@@ -1059,14 +1063,12 @@
                     <span id="logsCountLabel" class="font-bold text-indigo-600 dark:text-indigo-400"></span>
                 </div>
 
-                <div id="activityLogsContainer" class="space-y-2.5 max-h-[60vh] overflow-y-auto pr-1">
-                    <!-- يتم تحميل السجلات من Supabase هنا -->
-                </div>
+                <div id="activityLogsContainer" class="space-y-2.5 max-h-[60vh] overflow-y-auto pr-1"></div>
             </div>
         </div>
     </div>
 
-    <!-- نافذة تغيير الحالة السريع للمستخدم المحدود (للمشاريع المقفلة الخاصة بالمدير) -->
+    <!-- نافذة تغيير الحالة السريع للمستخدم المحدود -->
     <div id="quickStatusModal" class="fixed inset-0 z-[60] hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="max-w-md w-full bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 shadow-2xl space-y-4">
             <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
@@ -1137,7 +1139,7 @@
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         const SESSION_STORAGE_KEY = 'alrai_eng_auth_session_v1';
-        let currentUser = null; // { id, username, baseFullName, displayName, role: 'Admin' | 'Limited' }
+        let currentUser = null;
         let realtimeChannel = null;
         let isApplyingRemoteSync = false;
 
@@ -1189,7 +1191,7 @@
         let tempItemPrices = {};
 
         // ============================================================
-        // 2. دوال ربط مجلدات الكمبيوتر (PC Folders Integration)
+        // 2. دوال ربط مجلدات الكمبيوتر واختيار المجلد (Directory Picker)
         // ============================================================
         function openFolderSettingsModal() {
             document.getElementById('rootPcPathInput').value = pcRootPath;
@@ -1198,6 +1200,29 @@
 
         function closeFolderSettingsModal() {
             document.getElementById('folderSettingsModal').classList.add('hidden');
+        }
+
+        // استخدام Directory Picker لاختيار مجلد المشروع بضغطة زر واحدة من نافذة المتصفح
+        async function pickProjectDirectoryFolder() {
+            if (window.showDirectoryPicker) {
+                try {
+                    const dirHandle = await window.showDirectoryPicker();
+                    if (dirHandle && dirHandle.name) {
+                        // استخدام اسم المجلد المختار كمسار أساسي أو جذري
+                        const chosenPath = dirHandle.name;
+                        pcRootPath = chosenPath;
+                        document.getElementById('rootPcPathInput').value = chosenPath;
+                        localStorage.setItem(STORAGE_KEYS.PC_ROOT_PATH, pcRootPath);
+                        showToast(`تم اختيار مجلد المشروع "${chosenPath}" بنجاح`, 'success');
+                    }
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        showToast('تم إلغاء اختيار المجلد أو أن المتصفح لا يدعم الوصول المباشر', 'info');
+                    }
+                }
+            } else {
+                showToast('متصفحك لا يدعم نافذة اختيار المجلدات المباشرة. يرجى إدخال المسار يدوياً.', 'warning');
+            }
         }
 
         function saveFolderSettings() {
@@ -1210,20 +1235,17 @@
             closeFolderSettingsModal();
         }
 
-        // استخراج اسم الشركة بدقة من اسم المشروع (مثلاً: "مبنى إداري (شركة الخليج)" -> "شركة الخليج")
         function extractCompanyName(projectName) {
             if (!projectName) return 'مشروع_عام';
             const match = projectName.match(/\(([^)]+)\)/);
             if (match && match[1]) {
                 return match[1].trim();
             }
-            // إذا لم توجد أقواس، نأخذ اسم المشروع أو الكلمة الأولى
             return projectName.trim();
         }
 
         function getCompanyFolderPath(projectName) {
             const companyName = extractCompanyName(projectName);
-            // إزالة الرموز غير المسموحة في مسارات ويندوز إن وجدت
             const cleanName = companyName.replace(/[<>:"/\\|?*]/g, '_');
             const cleanRoot = pcRootPath.replace(/[/\\]+$/, '');
             return `${cleanRoot}\\${cleanName}`;
@@ -1233,12 +1255,10 @@
             const folderPath = getCompanyFolderPath(projectName);
             const fileUri = `file:///${folderPath.replace(/\\/g, '/')}`;
 
-            // محاولة فتح المجلد مباشرة عبر بروتوكول file://
             try {
                 const win = window.open(fileUri, '_blank');
                 if (!win || win.closed || typeof win.closed == 'undefined') {
-                    // إذا منع المتصفح الفتح المباشر، نقوم بنسخ المسار للحافظة كخطة بديلة
-                    copyPathToClipboard(folderPath, `تم حظر الفتح المباشر من المتصفح. تم نسخ المسار "${folderPath}" إلى الحافظة بنجاح!`);
+                    copyPathToClipboard(folderPath, `تم نسخ مسار المجلد "${folderPath}" إلى الحافظة بنجاح!`);
                 } else {
                     showToast(`جاري فتح مجلد الشركة: ${folderPath}`, 'success');
                 }
@@ -1982,7 +2002,6 @@
             }
 
             let parsedData = null;
-
             const syncMatch = rawText.match(/\[ALRAI_SYNC:([A-Za-z0-9+/=]+)\]/);
             if (syncMatch && syncMatch[1]) {
                 try {
@@ -2001,7 +2020,6 @@
             if (!parsedData) {
                 parsedData = {};
                 const lines = rawText.split('\n').map(l => l.trim()).filter(Boolean);
-                
                 let projName = '';
                 let compName = '';
                 let sender = 'م. أمير';
@@ -2555,7 +2573,6 @@
                 };
 
                 showToast(`تم تحديث بيانات المشروع ${quotationCode} بنجاح`, 'success');
-                
                 const statusChangedNote = oldProj.status !== status ? ` (وتغيير الحالة من "${oldProj.status}" إلى "${status}")` : '';
                 await logActivity('تعديل', `تعديل بيانات المشروع (${quotationCode} - ${projectName})${statusChangedNote}`);
             } else {
@@ -2864,7 +2881,6 @@
                 
                 const hasFullAccess = canFullEditProject(p);
                 const creatorNameDisplay = p.createdBy || 'م. أمير';
-                const companyFolder = getCompanyFolderPath(p.projectName);
 
                 return `
                 <article class="rounded-2xl bg-white dark:bg-slate-900 border ${cardHighlightClass} p-5 shadow-sm hover:shadow-xl transition-all flex flex-col justify-between gap-4">
@@ -2887,7 +2903,6 @@
                             </p>
                         </div>
 
-                        <!-- زر فتح مجلد الشركة المحلي على جهاز PC -->
                         <div class="flex items-center gap-2 pt-1">
                             <button onclick="openCompanyFolder('${p.projectName.replace(/'/g, "\\'")}')" class="w-full py-2 px-3 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-500/30 font-bold text-xs flex items-center justify-between transition cursor-pointer" title="فتح مجلد المشروع على الكمبيوتر أو نسخ مساره">
                                 <span class="flex items-center gap-2 truncate">
@@ -3088,7 +3103,6 @@
                     <div><span class="text-xs text-slate-400 block">تاريخ تقديم العرض</span><span class="text-sm font-bold num-en text-slate-800 dark:text-slate-200">${p.submissionDate || 'لم يُحدد بعد'}</span></div>
                 </div>
 
-                <!-- رابط مجلد الكمبيوتر داخل تفاصيل المشروع -->
                 <div class="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-between gap-3">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg"><i class="fa-solid fa-folder-tree"></i></div>
